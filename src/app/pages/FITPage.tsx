@@ -46,6 +46,8 @@ const highlights = [
   { icon: Users, label: "Expert Mentors" },
 ];
 
+import { submitForm } from "../utils/submission";
+
 export function FITPage() {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
@@ -55,26 +57,16 @@ export function FITPage() {
     setStatus("submitting");
 
     try {
-      const response = await fetch("/api/submissions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          form_type: "fit_enrollment",
-          name: formData.name,
-          phone: formData.phone,
-          email: "FIT-Course-Enrollment",
-          message: `FIT Course Enrollment\nName: ${formData.name}\nPhone: ${formData.phone}`,
-        }),
+      await submitForm({
+        form_type: "fit_enrollment",
+        name: formData.name,
+        phone: formData.phone,
+        email: "FIT-Course-Enrollment",
+        message: `FIT Course Enrollment\nName: ${formData.name}\nPhone: ${formData.phone}`,
       });
 
-      if (response.ok) {
-        setStatus("success");
-        setFormData({ name: "", phone: "" });
-      } else {
-        throw new Error("Failed to submit FIT enrollment request");
-      }
+      setStatus("success");
+      setFormData({ name: "", phone: "" });
     } catch (error) {
       console.error("Enrollment error:", error);
       alert("Something went wrong. Please try again.");

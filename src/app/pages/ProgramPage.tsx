@@ -9,6 +9,8 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { PROGRAMS } from "../components/OurPrograms";
 
+import { submitForm } from "../utils/submission";
+
 function EnrolForm({ prog }: { prog: typeof PROGRAMS[0] }) {
   const [data, setData] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
@@ -18,26 +20,16 @@ function EnrolForm({ prog }: { prog: typeof PROGRAMS[0] }) {
     setStatus("submitting");
 
     try {
-      const response = await fetch("/api/submissions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          form_type: `${prog.id}_enrollment`,
-          name: data.name,
-          phone: data.phone,
-          email: `${prog.short}-Enrollment`,
-          message: `${prog.short} Enrollment\nName: ${data.name}\nPhone: ${data.phone}`,
-        }),
+      await submitForm({
+        form_type: `${prog.id}_enrollment`,
+        name: data.name,
+        phone: data.phone,
+        email: `${prog.short}-Enrollment`,
+        message: `${prog.short} Enrollment\nName: ${data.name}\nPhone: ${data.phone}`,
       });
 
-      if (response.ok) {
-        setStatus("success");
-        setData({ name: "", phone: "" });
-      } else {
-        throw new Error("Failed to submit enrollment request");
-      }
+      setStatus("success");
+      setData({ name: "", phone: "" });
     } catch (error) {
       console.error("Enrollment error:", error);
       alert("Something went wrong. Please try again.");

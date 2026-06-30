@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { useState } from "react";
+import { submitForm } from "../utils/submission";
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -19,26 +20,16 @@ export function Contact() {
     setStatus("submitting");
 
     try {
-      const response = await fetch("/api/submissions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          form_type: "contact",
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          message: formData.message,
-        }),
+      await submitForm({
+        form_type: "contact",
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message,
       });
 
-      if (response.ok) {
-        setStatus("success");
-        setFormData({ name: "", email: "", phone: "", message: "" });
-      } else {
-        throw new Error("Failed to submit inquiry");
-      }
+      setStatus("success");
+      setFormData({ name: "", email: "", phone: "", message: "" });
     } catch (error) {
       console.error("Submission error:", error);
       alert("Something went wrong. Please try again.");
