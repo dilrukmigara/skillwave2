@@ -24,19 +24,16 @@ export const SUBMISSION_CONFIG = {
    * 5. Extract the entry IDs (e.g., entry.123456789) and map them below.
    */
   googleForm: {
-    // URL to submit forms (ends with /formResponse)
-    actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfXYZ_EXAMPLE_ID/formResponse',
-    
-    // URL to view the form (ends with /viewform) - used for redirection
-    viewUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSfXYZ_EXAMPLE_ID/viewform',
+    actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdJuUPHHfwlQ1P3Ufnm6H9cC-TgNvBoNyQDOIJYDERN33jMUw/formResponse',
 
-    // Map your form fields to the exact entry IDs from the pre-filled link
+    viewUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSdJuUPHHfwlQ1P3Ufnm6H9cC-TgNvBoNyQDOIJYDERN33jMUw/viewform',
+
     entries: {
-      form_type: 'entry.1000001', // ID for Form Type
-      name: 'entry.1000002',      // ID for Name
-      phone: 'entry.1000003',     // ID for Phone
-      email: 'entry.1000004',     // ID for Email
-      message: 'entry.1000005',   // ID for Message
+      form_type: 'entry.1891029657',
+      name: 'entry.2118924887',
+      phone: 'entry.462119940',
+      email: 'entry.1895805292',
+      message: 'entry.2054205580',
     }
   }
 };
