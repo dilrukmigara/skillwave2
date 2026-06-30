@@ -6,7 +6,6 @@ import { FITPage } from "./pages/FITPage";
 import { RoboIoTPage } from "./pages/RoboIoTPage";
 import { DevOpsPage } from "./pages/DevOpsPage";
 import { WebMasterPage } from "./pages/WebMasterPage";
-import { AdminPage } from "./pages/AdminPage";
 
 function Root() {
   return (
@@ -38,7 +37,6 @@ export const router = createBrowserRouter([
       { path: "robo-iot", Component: RoboIoTPage },
       { path: "devops", Component: DevOpsPage },
       { path: "web-master", Component: WebMasterPage },
-      { path: "admin", Component: AdminPage },
       { path: "*", Component: NotFound },
     ],
   },
