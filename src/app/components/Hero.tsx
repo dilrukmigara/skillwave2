@@ -13,7 +13,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-green-50"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-green-50 dark:from-[#050f1a] dark:via-[#07121f] dark:to-[#050f1a] transition-colors duration-300"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-[#305a49]/10 rounded-full blur-3xl animate-pulse"></div>
@@ -43,19 +43,19 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             Empowering the Next Generation
             <br />
             Through IT Education
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto transition-colors duration-300">
             Learn IT skills from beginner to advanced levels with SkillWave.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Button
               size="lg"
               onClick={() => scrollToSection("levels")}
-              className="bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 text-lg px-8 py-6"
+              className="bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 text-lg px-8 py-6 cursor-pointer text-white"
             >
               Explore Courses
             </Button>
@@ -63,7 +63,7 @@ export function Hero() {
               size="lg"
               variant="outline"
               onClick={() => scrollToSection("contact")}
-              className="border-2 border-[#183d64] text-[#183d64] hover:bg-[#183d64] hover:text-white text-lg px-8 py-6"
+              className="border-2 border-[#183d64] dark:border-emerald-500 text-[#183d64] dark:text-emerald-400 hover:bg-[#183d64] dark:hover:bg-emerald-500 hover:text-white dark:hover:text-white text-lg px-8 py-6 transition-all duration-300 cursor-pointer"
             >
               Join Now
             </Button>
@@ -84,10 +84,10 @@ export function Hero() {
           ].map((item, index) => (
             <div
               key={index}
-              className="bg-white/60 backdrop-blur-lg rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="bg-white/60 dark:bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-lg dark:shadow-emerald-950/20 hover:shadow-xl transition-all duration-300 border border-transparent dark:border-white/5"
             >
-              <item.icon className="w-12 h-12 mx-auto mb-3 text-[#183d64]" />
-              <p className="text-sm font-medium text-gray-700">{item.label}</p>
+              <item.icon className="w-12 h-12 mx-auto mb-3 text-[#183d64] dark:text-cyan-400" />
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.label}</p>
             </div>
           ))}
         </motion.div>

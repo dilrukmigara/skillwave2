@@ -7,10 +7,33 @@ import { useState } from "react";
 export function Newsletter() {
   const [email, setEmail] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert("Thank you for subscribing to SkillWave newsletter!");
-    setEmail("");
+
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          form_type: "newsletter",
+          name: "Newsletter Subscriber",
+          phone: "N/A",
+          email: email,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Thank you for subscribing to SkillWave newsletter!");
+        setEmail("");
+      } else {
+        throw new Error("Failed to subscribe");
+      }
+    } catch (err) {
+      console.error("Newsletter submission error:", err);
+      alert("Subscription failed. Please try again.");
+    }
   };
 
   return (

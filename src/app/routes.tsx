@@ -6,10 +6,11 @@ import { FITPage } from "./pages/FITPage";
 import { RoboIoTPage } from "./pages/RoboIoTPage";
 import { DevOpsPage } from "./pages/DevOpsPage";
 import { WebMasterPage } from "./pages/WebMasterPage";
+import { AdminPage } from "./pages/AdminPage";
 
 function Root() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <Navbar />
       <main>
         <Outlet />
@@ -37,6 +38,7 @@ export const router = createBrowserRouter([
       { path: "robo-iot", Component: RoboIoTPage },
       { path: "devops", Component: DevOpsPage },
       { path: "web-master", Component: WebMasterPage },
+      { path: "admin", Component: AdminPage },
       { path: "*", Component: NotFound },
     ],
   },

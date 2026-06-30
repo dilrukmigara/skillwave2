@@ -110,7 +110,7 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="flex flex-col bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-2xl transition-all duration-500 group h-full"
+      className="flex flex-col bg-white dark:bg-[#07121f]/50 border border-gray-100 dark:border-white/10 rounded-3xl overflow-hidden hover:shadow-2xl dark:hover:shadow-emerald-500/5 transition-all duration-500 group h-full"
     >
       {/* ── Header ── */}
       <div className={`relative bg-gradient-to-br ${prog.bgGradient} p-7 pb-6 overflow-hidden`}>
@@ -121,7 +121,7 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
         <div className="relative z-10">
           {/* Category + Difficulty */}
           <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <span className="text-xs font-semibold bg-white/80 text-gray-800 px-3 py-1 rounded-full shadow-sm">
+            <span className="text-xs font-semibold bg-white/80 dark:bg-black/60 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full shadow-sm">
               {prog.category}
             </span>
             <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${prog.difficultyColor}`}>
@@ -136,12 +136,12 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
             </div>
             <div>
               <p className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-0.5">{prog.short}</p>
-              <h3 className="text-gray-900 font-extrabold text-[22px] leading-tight">{prog.title}</h3>
+              <h3 className="text-gray-900 dark:text-white font-extrabold text-[22px] leading-tight">{prog.title}</h3>
             </div>
           </div>
 
           {/* Duration */}
-          <div className="flex items-center gap-1.5 mt-4 text-gray-600 text-sm">
+          <div className="flex items-center gap-1.5 mt-4 text-gray-600 dark:text-gray-400 text-sm">
             <Clock className="w-4 h-4 text-gray-400" />
             <span>{prog.duration}</span>
           </div>
@@ -149,9 +149,9 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
       </div>
 
       {/* ── Body ── */}
-      <div className="flex flex-col flex-1 p-7 space-y-6 bg-white">
+      <div className="flex flex-col flex-1 p-7 space-y-6 bg-white dark:bg-[#050f1a] transition-colors duration-300">
         {/* Description */}
-        <p className="text-gray-600 text-[15px] leading-relaxed">{prog.description}</p>
+        <p className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed">{prog.description}</p>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
@@ -160,21 +160,21 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
             { label: "Rating", value: prog.stats.rating + " ⭐" },
             { label: "Completion", value: prog.stats.completion },
           ].map((s) => (
-            <div key={s.label} className="bg-gray-50 rounded-xl p-3 text-center border border-gray-100/50">
-              <p className="text-gray-900 font-bold text-sm">{s.value}</p>
-              <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
+            <div key={s.label} className="bg-gray-50 dark:bg-[#183d64]/10 rounded-xl p-3 text-center border border-gray-100/50 dark:border-white/5">
+              <p className="text-gray-900 dark:text-white font-bold text-sm">{s.value}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* Learning Outcomes */}
         <div>
-          <p className="text-gray-900 text-xs font-bold uppercase tracking-widest mb-3">What You'll Achieve</p>
+          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-3">What You'll Achieve</p>
           <div className="space-y-2">
             {prog.outcomes.map((o) => (
               <div key={o} className="flex items-center gap-2">
                 <CheckCircle className={`w-4 h-4 flex-shrink-0 ${prog.accentText}`} />
-                <p className="text-gray-600 text-sm">{o}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{o}</p>
               </div>
             ))}
           </div>
@@ -182,7 +182,7 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
 
         {/* Roadmap */}
         <div>
-          <p className="text-gray-900 text-xs font-bold uppercase tracking-widest mb-3">Programme Roadmap</p>
+          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-3">Programme Roadmap</p>
           <div className="space-y-1">
             {prog.modules.map((m, i) => (
               <div key={i}>
@@ -191,13 +191,13 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
                     {m.step}
                   </div>
                   <div>
-                    <p className="text-gray-900 text-sm font-semibold">{m.title}</p>
-                    <p className="text-gray-500 text-xs">{m.sub}</p>
+                    <p className="text-gray-900 dark:text-white text-sm font-semibold">{m.title}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">{m.sub}</p>
                   </div>
                 </div>
                 {i < prog.modules.length - 1 && (
                   <div className="ml-3.5 mt-0.5 mb-0.5">
-                    <ChevronDown className="w-3 h-3 text-gray-400" />
+                    <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-600" />
                   </div>
                 )}
               </div>
@@ -217,10 +217,10 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
 
         {/* Career Paths */}
         <div>
-          <p className="text-gray-900 text-xs font-bold uppercase tracking-widest mb-2">Career Paths</p>
+          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-2">Career Paths</p>
           <div className="flex flex-wrap gap-2">
             {prog.careers.map((c) => (
-              <span key={c} className="text-xs text-gray-600 bg-gray-50 border border-gray-200 px-3 py-1 rounded-full">
+              <span key={c} className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full">
                 {c}
               </span>
             ))}
@@ -246,7 +246,7 @@ function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number 
 
 export function OurPrograms() {
   return (
-    <section id="levels" className="relative py-24 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+    <section id="levels" className="relative py-24 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-[#050f1a] dark:to-[#07121f] transition-colors duration-300">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-green-500/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
@@ -257,13 +257,13 @@ export function OurPrograms() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 border border-gray-200 text-gray-700 text-sm tracking-widest uppercase mb-6 shadow-sm">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm tracking-widest uppercase mb-6 shadow-sm">
             <Server className="w-4 h-4 text-gray-500" /> Our Programs
           </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 bg-gradient-to-r from-[#305a49] to-[#183d64] bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             More Paths to Greatness
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto transition-colors duration-300">
             Specialist programmes in Robotics & IoT, DevOps, and Full-Stack Web. Click any card to explore the full programme.
           </p>
         </motion.div>

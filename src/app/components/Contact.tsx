@@ -3,17 +3,7 @@ import { Phone, Mail, Globe, Send, MapPin, Clock, CheckCircle, Loader2 } from "l
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
-import { useState, useRef } from "react";
-
-const GOOGLE_FORM_ACTION =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdDVPfKKBWT2_EFLHfE1zfmIBuvR1qf40j0PIMvl7rH6QtqVQ/formResponse";
-
-const ENTRY = {
-  name: "entry.217575541",
-  email: "entry.352240798",
-  phone: "entry.677023741",
-  message: "entry.1181666628",
-};
+import { useState } from "react";
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -23,30 +13,36 @@ export function Contact() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const IFRAME_NAME = "hidden-gform-target";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
 
-    // The form targets the hidden iframe — Google Forms receives the POST normally.
-    // We listen for the iframe load event to know when the redirect back completes.
-    const onLoad = () => {
-      setStatus("success");
-      setFormData({ name: "", email: "", phone: "", message: "" });
-      iframeRef.current?.removeEventListener("load", onLoad);
-    };
-    iframeRef.current?.addEventListener("load", onLoad);
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          form_type: "contact",
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+        }),
+      });
 
-    // Programmatically submit the real HTML form that targets the iframe
-    const hiddenForm = document.getElementById("gform-hidden") as HTMLFormElement;
-    if (hiddenForm) {
-      (hiddenForm.querySelector(`[name="${ENTRY.name}"]`) as HTMLInputElement).value = formData.name;
-      (hiddenForm.querySelector(`[name="${ENTRY.email}"]`) as HTMLInputElement).value = formData.email;
-      (hiddenForm.querySelector(`[name="${ENTRY.phone}"]`) as HTMLInputElement).value = formData.phone;
-      (hiddenForm.querySelector(`[name="${ENTRY.message}"]`) as HTMLTextAreaElement).value = formData.message;
-      hiddenForm.submit();
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        throw new Error("Failed to submit inquiry");
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      alert("Something went wrong. Please try again.");
+      setStatus("idle");
     }
   };
 
@@ -58,32 +54,7 @@ export function Contact() {
   ];
 
   return (
-    <section id="contact" className="py-20 bg-white">
-      {/* Hidden iframe that receives the Google Form redirect */}
-      <iframe
-        ref={iframeRef}
-        id="hidden-gform-iframe"
-        name={IFRAME_NAME}
-        title="form-submit-target"
-        style={{ display: "none", width: 0, height: 0, border: "none", position: "absolute" }}
-        aria-hidden="true"
-      />
-
-      {/* Hidden HTML form that actually POSTs to Google Forms */}
-      <form
-        id="gform-hidden"
-        action={GOOGLE_FORM_ACTION}
-        method="POST"
-        target={IFRAME_NAME}
-        style={{ display: "none" }}
-        aria-hidden="true"
-      >
-        <input type="text" name={ENTRY.name} defaultValue="" />
-        <input type="text" name={ENTRY.email} defaultValue="" />
-        <input type="text" name={ENTRY.phone} defaultValue="" />
-        <textarea name={ENTRY.message} defaultValue="" />
-      </form>
-
+    <section id="contact" className="py-20 bg-white dark:bg-[#050f1a] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -92,10 +63,10 @@ export function Contact() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             Get In Touch
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">
             Ready to start your IT journey? Contact us today and we'll respond as soon as possible!
           </p>
         </motion.div>
@@ -156,14 +127,14 @@ export function Contact() {
                   <CheckCircle className="w-10 h-10 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-[#183d64] mb-2">Message Sent!</h3>
-                  <p className="text-gray-600 max-w-sm">
+                  <h3 className="text-2xl font-bold text-[#183d64] dark:text-emerald-400 mb-2 transition-colors">Message Sent!</h3>
+                  <p className="text-gray-600 dark:text-gray-300 max-w-sm transition-colors">
                     Thank you for reaching out. Your message has been recorded and we'll get back to you shortly.
                   </p>
                 </div>
                 <Button
                   variant="outline"
-                  className="border-2 border-[#183d64] text-[#183d64] hover:bg-[#183d64] hover:text-white rounded-xl"
+                  className="border-2 border-[#183d64] dark:border-emerald-500 text-[#183d64] dark:text-emerald-400 hover:bg-[#183d64] dark:hover:bg-emerald-500 hover:text-white dark:hover:text-white rounded-xl transition-all cursor-pointer"
                   onClick={() => setStatus("idle")}
                 >
                   Send Another Message
@@ -178,7 +149,7 @@ export function Contact() {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                     disabled={status === "submitting"}
-                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] rounded-xl"
+                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-emerald-500 rounded-xl transition-all"
                   />
                 </div>
                 <div>
@@ -189,7 +160,7 @@ export function Contact() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     required
                     disabled={status === "submitting"}
-                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] rounded-xl"
+                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-emerald-500 rounded-xl transition-all"
                   />
                 </div>
                 <div>
@@ -199,7 +170,7 @@ export function Contact() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     disabled={status === "submitting"}
-                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] rounded-xl"
+                    className="h-12 border-2 border-gray-200 focus:border-[#183d64] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-emerald-500 rounded-xl transition-all"
                   />
                 </div>
                 <div>
@@ -210,7 +181,7 @@ export function Contact() {
                     required
                     rows={6}
                     disabled={status === "submitting"}
-                    className="border-2 border-gray-200 focus:border-[#183d64] rounded-xl resize-none"
+                    className="border-2 border-gray-200 focus:border-[#183d64] dark:border-white/10 dark:bg-white/5 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-emerald-500 rounded-xl resize-none transition-all"
                   />
                 </div>
 

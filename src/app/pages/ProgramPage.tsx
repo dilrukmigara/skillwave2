@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import {
   ArrowLeft, Clock, CheckCircle, ChevronDown,
@@ -9,53 +9,44 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { PROGRAMS } from "../components/OurPrograms";
 
-const GOOGLE_FORM_ACTION =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdDVPfKKBWT2_EFLHfE1zfmIBuvR1qf40j0PIMvl7rH6QtqVQ/formResponse";
-const ENTRY = {
-  name: "entry.217575541",
-  phone: "entry.677023741",
-  email: "entry.352240798",
-  message: "entry.1181666628",
-};
-
 function EnrolForm({ prog }: { prog: typeof PROGRAMS[0] }) {
   const [data, setData] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
-  const iframeName = `iframe-prog-${prog.id}`;
-  const formId = `gform-prog-${prog.id}`;
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
-    const onLoad = () => {
-      setStatus("success");
-      setData({ name: "", phone: "" });
-      iframeRef.current?.removeEventListener("load", onLoad);
-    };
-    iframeRef.current?.addEventListener("load", onLoad);
-    const hf = document.getElementById(formId) as HTMLFormElement;
-    if (hf) {
-      (hf.querySelector(`[name="${ENTRY.name}"]`) as HTMLInputElement).value = data.name;
-      (hf.querySelector(`[name="${ENTRY.phone}"]`) as HTMLInputElement).value = data.phone;
-      (hf.querySelector(`[name="${ENTRY.email}"]`) as HTMLInputElement).value = `${prog.short}-Enrollment`;
-      (hf.querySelector(`[name="${ENTRY.message}"]`) as HTMLTextAreaElement).value =
-        `${prog.short} Enrollment\nName: ${data.name}\nPhone: ${data.phone}`;
-      hf.submit();
+
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          form_type: `${prog.id}_enrollment`,
+          name: data.name,
+          phone: data.phone,
+          email: `${prog.short}-Enrollment`,
+          message: `${prog.short} Enrollment\nName: ${data.name}\nPhone: ${data.phone}`,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setData({ name: "", phone: "" });
+      } else {
+        throw new Error("Failed to submit enrollment request");
+      }
+    } catch (error) {
+      console.error("Enrollment error:", error);
+      alert("Something went wrong. Please try again.");
+      setStatus("idle");
     }
   };
 
   return (
     <>
-      <iframe ref={iframeRef} name={iframeName} title={`${prog.id}-target`}
-        style={{ display: "none", width: 0, height: 0, border: "none", position: "absolute" }} aria-hidden="true" />
-      <form id={formId} action={GOOGLE_FORM_ACTION} method="POST" target={iframeName}
-        style={{ display: "none" }} aria-hidden="true">
-        <input type="text" name={ENTRY.name} defaultValue="" />
-        <input type="text" name={ENTRY.phone} defaultValue="" />
-        <input type="text" name={ENTRY.email} defaultValue="" />
-        <textarea name={ENTRY.message} defaultValue="" />
-      </form>
 
       <AnimatePresence mode="wait">
         {status === "success" ? (
@@ -65,11 +56,11 @@ function EnrolForm({ prog }: { prog: typeof PROGRAMS[0] }) {
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <div>
-              <p className="text-white font-bold text-xl mb-1">You're on the list!</p>
-              <p className="text-gray-400 text-sm">We'll contact you with the enrollment link shortly.</p>
+              <p className="text-gray-900 dark:text-white font-bold text-xl mb-1 transition-colors">You're on the list!</p>
+              <p className="text-gray-600 dark:text-gray-400 text-sm transition-colors">We'll contact you with the enrollment link shortly.</p>
             </div>
             <button onClick={() => setStatus("idle")}
-              className={`text-sm underline underline-offset-2 ${prog.accentText} hover:opacity-70 transition-opacity`}>
+              className={`text-sm underline underline-offset-2 ${prog.accentText} hover:opacity-70 transition-opacity cursor-pointer`}>
               Register another
             </button>
           </motion.div>
@@ -80,16 +71,16 @@ function EnrolForm({ prog }: { prog: typeof PROGRAMS[0] }) {
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <Input placeholder="Your Full Name" value={data.name} required disabled={status === "submitting"}
                 onChange={(e) => setData({ ...data, name: e.target.value })}
-                className="pl-10 h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-500 focus:border-white/40 rounded-xl" />
+                className="pl-10 h-12 bg-white dark:bg-white/5 border-gray-200 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-400 dark:focus:border-white/40 rounded-xl transition-colors" />
             </div>
             <div className="relative">
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <Input type="tel" placeholder="Contact Number" value={data.phone} required disabled={status === "submitting"}
                 onChange={(e) => setData({ ...data, phone: e.target.value })}
-                className="pl-10 h-12 bg-white/5 border-white/20 text-white placeholder:text-gray-500 focus:border-white/40 rounded-xl" />
+                className="pl-10 h-12 bg-white dark:bg-white/5 border-gray-200 dark:border-white/20 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:border-gray-400 dark:focus:border-white/40 rounded-xl transition-colors" />
             </div>
             <Button type="submit" size="lg" disabled={status === "submitting"}
-              className={`w-full h-12 bg-gradient-to-r ${prog.gradient} hover:opacity-90 text-white rounded-xl font-semibold disabled:opacity-60`}>
+              className={`w-full h-12 bg-gradient-to-r ${prog.gradient} hover:opacity-90 text-white rounded-xl font-semibold disabled:opacity-60 cursor-pointer`}>
               {status === "submitting"
                 ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Registering…</>
                 : "Enroll Now →"}
@@ -109,23 +100,23 @@ export function ProgramPage({ id }: { id: string }) {
   return (
     <>
       {/* ── Hero ── */}
-      <section className="relative min-h-[55vh] bg-[#050f1a] flex items-end overflow-hidden pt-28 pb-16">
+      <section className="relative min-h-[55vh] bg-gradient-to-br from-slate-50 to-slate-100 dark:from-[#050f1a] dark:to-[#07121f] flex items-end overflow-hidden pt-28 pb-16 text-gray-900 dark:text-white transition-colors duration-300">
         <div className="absolute inset-0 pointer-events-none">
           <div className={`absolute inset-0 bg-gradient-to-br ${prog.gradientMid} opacity-60`} />
-          <div className="absolute inset-0 opacity-[0.04]"
-            style={{ backgroundImage: "linear-gradient(white 1px,transparent 1px),linear-gradient(90deg,white 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
+          <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.04] text-slate-900 dark:text-white"
+            style={{ backgroundImage: "linear-gradient(currentColor 1px,transparent 1px),linear-gradient(90deg,currentColor 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }} className="mb-8">
-            <Link to="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+            <Link to="/" className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm font-medium">
               <ArrowLeft className="w-4 h-4" /> Back to Home
             </Link>
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <div className="flex flex-wrap gap-2 mb-5">
-              <span className="text-xs font-semibold bg-white/10 text-white/80 px-3 py-1 rounded-full border border-white/10">
+              <span className="text-xs font-semibold bg-black/5 dark:bg-white/10 text-gray-750 dark:text-white/80 px-3 py-1 rounded-full border border-gray-200 dark:border-white/10 transition-colors">
                 {prog.category}
               </span>
               <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${prog.difficultyColor}`}>
@@ -139,11 +130,11 @@ export function ProgramPage({ id }: { id: string }) {
               </div>
               <div>
                 <p className={`text-xs font-bold tracking-widest uppercase ${prog.accentText} mb-0.5`}>{prog.short}</p>
-                <h1 className="text-4xl md:text-6xl font-extrabold text-white leading-tight">{prog.title}</h1>
+                <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 dark:text-white leading-tight transition-colors">{prog.title}</h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-gray-400 text-sm mt-4">
+            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 text-sm mt-4 transition-colors">
               <Clock className="w-4 h-4" />
               <span>{prog.duration}</span>
             </div>
@@ -152,7 +143,7 @@ export function ProgramPage({ id }: { id: string }) {
       </section>
 
       {/* ── Stats bar ── */}
-      <section className="bg-[#07121f] border-y border-white/5 py-8">
+      <section className="bg-slate-100 dark:bg-[#07121f] border-y border-gray-200 dark:border-white/5 py-8 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-8 justify-center md:justify-start">
             {[
@@ -163,8 +154,8 @@ export function ProgramPage({ id }: { id: string }) {
             ].map((s, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.07 }}>
-                <p className="text-white font-extrabold text-2xl">{s.value}</p>
-                <p className="text-gray-500 text-xs mt-0.5">{s.label}</p>
+                <p className="text-gray-900 dark:text-white font-extrabold text-2xl transition-colors">{s.value}</p>
+                <p className="text-gray-600 dark:text-gray-500 text-xs mt-0.5 transition-colors">{s.label}</p>
               </motion.div>
             ))}
           </div>
@@ -172,7 +163,7 @@ export function ProgramPage({ id }: { id: string }) {
       </section>
 
       {/* ── Main content ── */}
-      <section className="bg-[#050f1a] py-20">
+      <section className="bg-white dark:bg-[#050f1a] py-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Left 2/3 */}
@@ -180,19 +171,19 @@ export function ProgramPage({ id }: { id: string }) {
               {/* Description */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <h2 className="text-2xl font-extrabold text-white mb-3">About This Programme</h2>
-                <p className="text-gray-400 text-lg leading-relaxed">{prog.description}</p>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-3 transition-colors">About This Programme</h2>
+                <p className="text-gray-650 dark:text-gray-400 text-lg leading-relaxed transition-colors">{prog.description}</p>
               </motion.div>
 
               {/* Outcomes */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <h2 className="text-2xl font-extrabold text-white mb-5">What You'll Achieve</h2>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-5 transition-colors">What You'll Achieve</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {prog.outcomes.map((o) => (
-                    <div key={o} className="flex items-center gap-3 bg-white/5 border border-white/8 rounded-xl px-4 py-3">
+                    <div key={o} className="flex items-center gap-3 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/8 rounded-xl px-4 py-3 transition-all">
                       <CheckCircle className={`w-5 h-5 flex-shrink-0 ${prog.accentText}`} />
-                      <p className="text-gray-200 text-sm font-medium">{o}</p>
+                      <p className="text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors">{o}</p>
                     </div>
                   ))}
                 </div>
@@ -201,22 +192,22 @@ export function ProgramPage({ id }: { id: string }) {
               {/* Roadmap */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <h2 className="text-2xl font-extrabold text-white mb-5">Programme Roadmap</h2>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-5 transition-colors">Programme Roadmap</h2>
                 <div className="space-y-2">
                   {prog.modules.map((m, i) => (
                     <div key={i}>
-                      <div className="flex items-start gap-4 bg-white/5 border border-white/8 rounded-2xl p-5 hover:border-white/15 transition-colors">
+                      <div className="flex items-start gap-4 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/8 rounded-2xl p-5 hover:border-gray-300 dark:hover:border-white/15 transition-all">
                         <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${prog.gradient} flex items-center justify-center flex-shrink-0 text-white font-extrabold text-sm`}>
                           {m.step}
                         </div>
                         <div>
-                          <p className="text-white font-bold">{m.title}</p>
-                          <p className="text-gray-500 text-sm">{m.sub}</p>
+                          <p className="text-gray-900 dark:text-white font-bold transition-colors">{m.title}</p>
+                          <p className="text-gray-600 dark:text-gray-500 text-sm transition-colors">{m.sub}</p>
                         </div>
                       </div>
                       {i < prog.modules.length - 1 && (
                         <div className="flex justify-center my-1">
-                          <ChevronDown className="w-4 h-4 text-gray-600" />
+                          <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-600" />
                         </div>
                       )}
                     </div>
@@ -227,7 +218,7 @@ export function ProgramPage({ id }: { id: string }) {
               {/* Skills */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <h2 className="text-2xl font-extrabold text-white mb-4">Skills You'll Learn</h2>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors">Skills You'll Learn</h2>
                 <div className="flex flex-wrap gap-3">
                   {prog.tags.map((t) => (
                     <span key={t}
@@ -241,12 +232,12 @@ export function ProgramPage({ id }: { id: string }) {
               {/* Careers */}
               <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }} transition={{ duration: 0.5 }}>
-                <h2 className="text-2xl font-extrabold text-white mb-4">Career Paths</h2>
+                <h2 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-4 transition-colors">Career Paths</h2>
                 <div className="flex flex-wrap gap-3">
                   {prog.careers.map((c) => (
-                    <div key={c} className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5">
+                    <div key={c} className="flex items-center gap-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 transition-all">
                       <div className={`w-2 h-2 rounded-full bg-gradient-to-br ${prog.gradient}`} />
-                      <span className="text-gray-200 text-sm font-medium">{c}</span>
+                      <span className="text-gray-700 dark:text-gray-200 text-sm font-medium transition-colors">{c}</span>
                     </div>
                   ))}
                 </div>
@@ -258,15 +249,15 @@ export function ProgramPage({ id }: { id: string }) {
               <div className="sticky top-28">
                 <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }} transition={{ duration: 0.6 }}
-                  className="bg-white/5 border border-white/10 rounded-3xl p-7">
+                  className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-3xl p-7 shadow-xl dark:shadow-none transition-all">
                   <div className={`w-full h-1.5 rounded-full bg-gradient-to-r ${prog.gradient} mb-6`} />
-                  <h3 className="text-white font-extrabold text-xl mb-1">Enroll Now</h3>
-                  <p className="text-gray-400 text-sm mb-6">
+                  <h3 className="text-gray-900 dark:text-white font-extrabold text-xl mb-1 transition-colors">Enroll Now</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-6 transition-colors">
                     Leave your name and contact number — we'll send the enrollment link straight to you.
                   </p>
                   <EnrolForm prog={prog} />
-                  <div className="mt-6 pt-6 border-t border-white/10 text-center space-y-1">
-                    <p className="text-gray-500 text-xs">Need help? Contact us directly.</p>
+                  <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10 text-center space-y-1 transition-colors">
+                    <p className="text-gray-650 dark:text-gray-500 text-xs transition-colors">Need help? Contact us directly.</p>
                     <p className={`text-sm font-semibold ${prog.accentText}`}>📞 071 277 7303</p>
                   </div>
                 </motion.div>

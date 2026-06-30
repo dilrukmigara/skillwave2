@@ -10,7 +10,7 @@ export function About() {
   ];
 
   return (
-    <section id="about" className="py-20 bg-white">
+    <section id="about" className="py-20 bg-white dark:bg-[#050f1a] transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -19,10 +19,10 @@ export function About() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] bg-clip-text text-transparent">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             About SkillWave
           </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors duration-300">
             SkillWave is a modern IT academy focused on practical education.
             From general IT knowledge to advanced technical skills, we help
             students build a strong future in technology. Anyone can join
@@ -38,13 +38,13 @@ export function About() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-gradient-to-br from-[#305a49]/5 to-[#183d64]/5 rounded-2xl p-6 text-center border border-gray-100 shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="bg-gradient-to-br from-[#305a49]/5 to-[#183d64]/5 dark:from-[#305a49]/15 dark:to-[#183d64]/15 rounded-2xl p-6 text-center border border-gray-100 dark:border-white/10 shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              <stat.icon className="w-10 h-10 mx-auto mb-3 text-[#183d64]" />
-              <div className="text-3xl md:text-4xl font-bold text-[#305a49] mb-2">
+              <stat.icon className="w-10 h-10 mx-auto mb-3 text-[#183d64] dark:text-cyan-400" />
+              <div className="text-3xl md:text-4xl font-bold text-[#305a49] dark:text-emerald-400 mb-2 transition-colors">
                 {stat.value}
               </div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 transition-colors">{stat.label}</div>
             </motion.div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
 import {
   CheckCircle, Loader2, Zap, Code2, Cpu,
@@ -9,15 +9,6 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import fitImage from "../../imports/Gemini_Generated_Image_.png";
-
-const GOOGLE_FORM_ACTION =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdDVPfKKBWT2_EFLHfE1zfmIBuvR1qf40j0PIMvl7rH6QtqVQ/formResponse";
-const ENTRY = {
-  name: "entry.217575541",
-  phone: "entry.677023741",
-  email: "entry.352240798",
-  message: "entry.1181666628",
-};
 
 const levels = [
   {
@@ -55,45 +46,44 @@ const highlights = [
   { icon: Users, label: "Expert Mentors" },
 ];
 
-const IFRAME_NAME = "fit-page-iframe";
-
 export function FITPage() {
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const handleEnrol = (e: React.FormEvent) => {
+  const handleEnrol = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
-    const onLoad = () => {
-      setStatus("success");
-      setFormData({ name: "", phone: "" });
-      iframeRef.current?.removeEventListener("load", onLoad);
-    };
-    iframeRef.current?.addEventListener("load", onLoad);
-    const hf = document.getElementById("fit-page-gform") as HTMLFormElement;
-    if (hf) {
-      (hf.querySelector(`[name="${ENTRY.name}"]`) as HTMLInputElement).value = formData.name;
-      (hf.querySelector(`[name="${ENTRY.phone}"]`) as HTMLInputElement).value = formData.phone;
-      (hf.querySelector(`[name="${ENTRY.email}"]`) as HTMLInputElement).value = "FIT-Course-Enrollment";
-      (hf.querySelector(`[name="${ENTRY.message}"]`) as HTMLTextAreaElement).value =
-        `FIT Course Enrollment\nName: ${formData.name}\nPhone: ${formData.phone}`;
-      hf.submit();
+
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          form_type: "fit_enrollment",
+          name: formData.name,
+          phone: formData.phone,
+          email: "FIT-Course-Enrollment",
+          message: `FIT Course Enrollment\nName: ${formData.name}\nPhone: ${formData.phone}`,
+        }),
+      });
+
+      if (response.ok) {
+        setStatus("success");
+        setFormData({ name: "", phone: "" });
+      } else {
+        throw new Error("Failed to submit FIT enrollment request");
+      }
+    } catch (error) {
+      console.error("Enrollment error:", error);
+      alert("Something went wrong. Please try again.");
+      setStatus("idle");
     }
   };
 
   return (
     <>
-      {/* Hidden form machinery */}
-      <iframe ref={iframeRef} name={IFRAME_NAME} title="fit-page-target"
-        style={{ display: "none", width: 0, height: 0, border: "none", position: "absolute" }} aria-hidden="true" />
-      <form id="fit-page-gform" action={GOOGLE_FORM_ACTION} method="POST" target={IFRAME_NAME}
-        style={{ display: "none" }} aria-hidden="true">
-        <input type="text" name={ENTRY.name} defaultValue="" />
-        <input type="text" name={ENTRY.phone} defaultValue="" />
-        <input type="text" name={ENTRY.email} defaultValue="" />
-        <textarea name={ENTRY.message} defaultValue="" />
-      </form>
 
       {/* ── Hero ── */}
       <section className="relative min-h-[60vh] bg-[#050f1a] flex items-center overflow-hidden pt-24 pb-16">
