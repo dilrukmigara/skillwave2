@@ -1,4 +1,5 @@
-import { Facebook, Instagram, Linkedin, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Mail, Twitter, Youtube } from "lucide-react";
+import { Link } from "react-router";
 import logoImage from "../../imports/WAVE__2_.png";
 
 export function Footer() {
@@ -8,6 +9,7 @@ export function Footer() {
     { label: "About Us", href: "#about" },
     { label: "Courses", href: "#levels" },
     { label: "Why Choose Us", href: "#why-choose" },
+    { label: "News", href: "/news" },
     { label: "Contact", href: "#contact" },
   ];
 
@@ -28,7 +30,7 @@ export function Footer() {
   return (
     <footer className="bg-gradient-to-b from-gray-900 to-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <img src={logoImage} alt="SkillWave Logo" className="h-12 w-12" />
@@ -56,12 +58,21 @@ export function Footer() {
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
-                  <a
-                    href={link.href}
-                    className="text-gray-400 hover:text-white transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("#") ? (
+                    <a
+                      href={link.href}
+                      className="text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link
+                      to={link.href}
+                      className="text-gray-400 hover:text-white transition-colors duration-200"
+                    >
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -81,6 +92,67 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-bold mb-4">Our Directors</h3>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3 group">
+                <img
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Hasara"
+                  alt="Y Hasara Dananjaya"
+                  className="w-10 h-10 rounded-full border border-gray-800 bg-gray-950 group-hover:border-emerald-500/50 transition-colors duration-300"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">Y Hasara Dananjaya</p>
+                  <p className="text-[11px] text-gray-400">Co-Founder & Director</p>
+                  <div className="flex gap-2.5 mt-1">
+                    <a
+                      href="#"
+                      className="text-gray-500 hover:text-[#0077b5] transition-colors duration-200"
+                      aria-label="LinkedIn"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href="mailto:contact@skillwave.lk"
+                      className="text-gray-500 hover:text-emerald-400 transition-colors duration-200"
+                      aria-label="Email"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 group">
+                <img
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Migara"
+                  alt="Migara Wickramarachchi"
+                  className="w-10 h-10 rounded-full border border-gray-800 bg-gray-950 group-hover:border-cyan-500/50 transition-colors duration-300"
+                />
+                <div>
+                  <p className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">Migara Wickramarachchi</p>
+                  <p className="text-[11px] text-gray-400">Co-Founder & Director</p>
+                  <div className="flex gap-2.5 mt-1">
+                    <a
+                      href="#"
+                      className="text-gray-500 hover:text-[#0077b5] transition-colors duration-200"
+                      aria-label="LinkedIn"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" />
+                    </a>
+                    <a
+                      href="mailto:contact@skillwave.lk"
+                      className="text-gray-500 hover:text-cyan-400 transition-colors duration-200"
+                      aria-label="Email"
+                    >
+                      <Mail className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div>

@@ -6,6 +6,7 @@ import { FITPage } from "./pages/FITPage";
 import { RoboIoTPage } from "./pages/RoboIoTPage";
 import { DevOpsPage } from "./pages/DevOpsPage";
 import { WebMasterPage } from "./pages/WebMasterPage";
+import { NewsPage } from "./pages/NewsPage";
 
 import { motion } from "motion/react";
 
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
       { path: "robo-iot", Component: RoboIoTPage },
       { path: "devops", Component: DevOpsPage },
       { path: "web-master", Component: WebMasterPage },
+      { path: "news", Component: NewsPage },
       { path: "*", Component: NotFound },
     ],
   },

@@ -46,10 +46,10 @@ export function Hero() {
           <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             Empowering the Next Generation
             <br />
-            Through IT Education
+            Through Future Ready Skills
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto transition-colors duration-300">
-            Learn IT skills from beginner to advanced levels with SkillWave.
+            Learn In-Demand Skills from beginner to advanced levels with SkillWave.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <Button

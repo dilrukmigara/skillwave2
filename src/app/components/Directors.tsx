@@ -8,11 +8,6 @@ export function Directors() {
       role: "Co-Founder & Director",
       image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Hasara",
     },
-    {
-      name: "Migara Wickramarachchi",
-      role: "Co-Founder & Director",
-      image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Migara",
-    },
   ];
 
   return (

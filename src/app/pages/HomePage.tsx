@@ -6,7 +6,6 @@ import { About } from "../components/About";
 import { OurPrograms } from "../components/OurPrograms";
 import { WhyChoose } from "../components/WhyChoose";
 import { VisionMission } from "../components/VisionMission";
-import { Directors } from "../components/Directors";
 import { Locations } from "../components/Locations";
 import { Testimonials } from "../components/Testimonials";
 import { FAQ } from "../components/FAQ";
@@ -107,7 +106,6 @@ export function HomePage() {
       <OurPrograms />
       <WhyChoose />
       <VisionMission />
-      <Directors />
       <Locations />
       <Testimonials />
       <FAQ />

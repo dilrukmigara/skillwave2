@@ -38,7 +38,7 @@ export function Navbar() {
     { label: "About", id: "about" },
     { label: "Courses", id: "levels" },
     { label: "Why Us", id: "why-choose" },
-    { label: "Team", id: "directors" },
+    { label: "News", path: "/news" },
     { label: "Contact", id: "contact" },
   ];
 
@@ -50,19 +50,32 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
-            <img src={logoImage} alt="SkillWave Logo" className="h-12 w-12" />
+            <img src={logoImage} alt="Skill Wave Logo" className="h-12 w-12" />
             <span className="text-xl font-bold bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
-              SkillWave
+              Skill Wave
             </span>
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
-              <button key={item.id} onClick={() => scrollToSection(item.id)}
-                className="text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium cursor-pointer">
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) =>
+              item.path ? (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  className="text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium cursor-pointer"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id!)}
+                  className="text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium cursor-pointer border-none bg-transparent"
+                >
+                  {item.label}
+                </button>
+              )
+            )}
             {mounted && (
               <button
                 onClick={() => setTheme(isDark ? "light" : "dark")}
@@ -98,12 +111,26 @@ export function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden bg-white/95 dark:bg-[#050f1a]/95 backdrop-blur-lg shadow-lg">
           <div className="px-4 py-6 space-y-4">
-            {navItems.map((item) => (
-              <button key={item.id} onClick={() => scrollToSection(item.id)}
-                className="block w-full text-left text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium py-2">
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) =>
+              item.path ? (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block w-full text-left text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium py-2"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id!)}
+                  className="block w-full text-left text-gray-700 dark:text-gray-200 hover:text-[#183d64] dark:hover:text-emerald-400 transition-colors duration-200 font-medium py-2 border-none bg-transparent"
+                >
+                  {item.label}
+                </button>
+              )
+            )}
             <Button onClick={() => scrollToSection("contact")}
               className="w-full bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white">
               Join Now
