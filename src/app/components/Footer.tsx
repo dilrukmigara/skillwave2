@@ -1,4 +1,11 @@
-import { Facebook, Instagram, Linkedin, Mail, Twitter, Youtube } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  Mail,
+  Twitter,
+  Youtube,
+} from "lucide-react";
 import { Link } from "react-router";
 import logoImage from "../../imports/WAVE__2_.png";
 
@@ -6,17 +13,17 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   const quickLinks = [
-    { label: "About Us", href: "#about" },
-    { label: "Courses", href: "#levels" },
-    { label: "Why Choose Us", href: "#why-choose" },
+    { label: "About Us", href: "/#about" },
+    { label: "Courses", href: "/#levels" },
+    { label: "Why Choose Us", href: "/#why-choose" },
     { label: "News", href: "/news" },
-    { label: "Contact", href: "#contact" },
+    { label: "Contact", href: "/#contact" },
   ];
 
   const courses = [
-    { label: "Beginner Level", href: "#levels" },
-    { label: "Intermediate Level", href: "#levels" },
-    { label: "Advanced Level", href: "#levels" },
+    { label: "Beginner Level", href: "/#levels" },
+    { label: "Intermediate Level", href: "/#levels" },
+    { label: "Advanced Level", href: "/#levels" },
   ];
 
   const socialLinks = [
@@ -37,19 +44,22 @@ export function Footer() {
               <span className="text-xl font-bold">SkillWave</span>
             </div>
             <p className="text-gray-400 mb-6">
-              Gateway to Greatness - Empowering the next generation through quality IT education since 2023.
+              Gateway to Greatness - Empowering the next generation through
+              quality IT education since 2023.
             </p>
             <div className="flex gap-3">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-lg flex items-center justify-center hover:bg-white/20 transition-all duration-300"
-                >
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
+              {socialLinks
+                .filter((social) => social.href !== "#")
+                .map((social, index) => (
+                  <a
+                    key={index}
+                    href={social.href}
+                    aria-label={social.label}
+                    className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-lg flex items-center justify-center hover:bg-white/20 transition-all duration-300"
+                  >
+                    <social.icon className="w-5 h-5" />
+                  </a>
+                ))}
             </div>
           </div>
 
@@ -104,16 +114,13 @@ export function Footer() {
                   className="w-10 h-10 rounded-full border border-gray-800 bg-gray-950 group-hover:border-emerald-500/50 transition-colors duration-300"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">Y Hasara Dananjaya</p>
-                  <p className="text-[11px] text-gray-400">Co-Founder & Director</p>
+                  <p className="text-sm font-semibold text-white group-hover:text-emerald-400 transition-colors duration-300">
+                    Y Hasara Dananjaya
+                  </p>
+                  <p className="text-[11px] text-gray-400">
+                    Co-Founder & Director
+                  </p>
                   <div className="flex gap-2.5 mt-1">
-                    <a
-                      href="#"
-                      className="text-gray-500 hover:text-[#0077b5] transition-colors duration-200"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin className="w-3.5 h-3.5" />
-                    </a>
                     <a
                       href="mailto:contact@skillwave.lk"
                       className="text-gray-500 hover:text-emerald-400 transition-colors duration-200"
@@ -132,16 +139,13 @@ export function Footer() {
                   className="w-10 h-10 rounded-full border border-gray-800 bg-gray-950 group-hover:border-cyan-500/50 transition-colors duration-300"
                 />
                 <div>
-                  <p className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">Migara Wickramarachchi</p>
-                  <p className="text-[11px] text-gray-400">Co-Founder & Director</p>
+                  <p className="text-sm font-semibold text-white group-hover:text-cyan-400 transition-colors duration-300">
+                    Migara Wickramarachchi
+                  </p>
+                  <p className="text-[11px] text-gray-400">
+                    Co-Founder & Director
+                  </p>
                   <div className="flex gap-2.5 mt-1">
-                    <a
-                      href="#"
-                      className="text-gray-500 hover:text-[#0077b5] transition-colors duration-200"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin className="w-3.5 h-3.5" />
-                    </a>
                     <a
                       href="mailto:contact@skillwave.lk"
                       className="text-gray-500 hover:text-cyan-400 transition-colors duration-200"
@@ -160,17 +164,26 @@ export function Footer() {
             <ul className="space-y-3 text-gray-400">
               <li>Baduraliya, Sri Lanka</li>
               <li>
-                <a href="tel:0712777303" className="hover:text-white transition-colors">
+                <a
+                  href="tel:0712777303"
+                  className="hover:text-white transition-colors"
+                >
                   0712777303
                 </a>
               </li>
               <li>
-                <a href="mailto:mail@skillwave.lk" className="hover:text-white transition-colors">
+                <a
+                  href="mailto:mail@skillwave.lk"
+                  className="hover:text-white transition-colors"
+                >
                   mail@skillwave.lk
                 </a>
               </li>
               <li>
-                <a href="https://skillwave.lk" className="hover:text-white transition-colors">
+                <a
+                  href="https://skillwave.lk"
+                  className="hover:text-white transition-colors"
+                >
                   skillwave.lk
                 </a>
               </li>
@@ -184,10 +197,10 @@ export function Footer() {
               © {currentYear} SkillWave. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="/privacy" className="hover:text-white transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="hover:text-white transition-colors">
+              <a href="/terms" className="hover:text-white transition-colors">
                 Terms of Service
               </a>
             </div>
