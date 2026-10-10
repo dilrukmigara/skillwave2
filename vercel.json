@@ -1,6 +1,38 @@
 {
   "rewrites": [
     {
+      "source": "/fit",
+      "destination": "/fit/index.html"
+    },
+    {
+      "source": "/robo-iot",
+      "destination": "/robo-iot/index.html"
+    },
+    {
+      "source": "/devops",
+      "destination": "/devops/index.html"
+    },
+    {
+      "source": "/web-master",
+      "destination": "/web-master/index.html"
+    },
+    {
+      "source": "/news",
+      "destination": "/news/index.html"
+    },
+    {
+      "source": "/free-learning",
+      "destination": "/free-learning/index.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms/index.html"
+    },
+    {
       "source": "/((?!assets/|robots.txt|sitemap.xml).*)",
       "destination": "/index.html"
     }
@@ -9,17 +41,28 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
         },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
       ]
     },
     {
       "source": "/(learn|admin|login|verify)(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ]
 }

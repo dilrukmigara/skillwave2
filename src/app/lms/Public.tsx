@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useLocation } from "react-router";
 import { db, rpc } from "./client";
+import { publicPages, privateTitles } from "../../seo";
 export function Verify() {
   const { id } = useParams(),
     [result, setResult] = useState<any>(null),
@@ -143,29 +144,16 @@ export function Policy({ type }: { type: "privacy" | "terms" }) {
 export function Metadata() {
   const { pathname, hash } = useLocation();
   useEffect(() => {
-    const names: Record<string, string> = {
-      "/": "Practical IT Courses in Sri Lanka",
-      "/fit": "Foundations of Information Technology",
-      "/robo-iot": "Robotics & Internet of Things",
-      "/devops": "DevOps Leadership",
-      "/web-master": "Full Stack Web Development",
-      "/news": "News and Learning Resources",
-      "/free-learning": "Free IT Video Lessons",
-      "/login": "Sign in to Your Learning Portal",
-      "/learn": "My Learning",
-      "/admin": "Academy Administration",
-      "/privacy": "Privacy Information",
-      "/terms": "Learning Terms",
-    };
+    const meta = publicPages[pathname];
     document.title =
-      (names[pathname] || "Certificate Verification") + " | SkillWave Academy";
-    const description = document.querySelector('meta[name="description"]');
-    description?.setAttribute(
-      "content",
-      pathname === "/free-learning"
-        ? "Explore free IT video lessons from SkillWave Academy. Start learning practical technology skills."
-        : "Learn practical IT skills with SkillWave Academy in Baduraliya and online. Explore courses, recorded lessons and live batch sessions.",
-    );
+      (meta?.title || privateTitles[pathname] || "Certificate Verification") +
+      " | SkillWave Academy";
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        "content",
+        meta?.description || "Your SkillWave Academy learning portal.",
+      );
     document
       .querySelector('meta[name="robots"]')
       ?.setAttribute(

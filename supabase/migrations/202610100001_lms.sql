@@ -1,5 +1,5 @@
 -- SkillWave: all authorization is enforced in Postgres, not browser role checks.
-create extension if not exists pgcrypto;
+-- PostgreSQL gen_random_uuid() is built-in; no extra extension required.
 create table public.profiles (
  id uuid primary key references auth.users on delete cascade,
  full_name text not null default '', role text not null default 'student' check(role in ('student','admin','superadmin'))
@@ -157,3 +157,33 @@ create function public.add_exam_question(eid uuid,prompt_text text,question_kind
  if question_kind='mcq' then insert into exam_keys values(qid,correct); end if; end $$;
 revoke execute on function public.add_exam_question(uuid,text,text,jsonb,integer,integer,integer) from public,anon;
 grant execute on function public.add_exam_question(uuid,text,text,jsonb,integer,integer,integer) to authenticated;
+
+-- Explicit Data API privileges, independent of project default privileges.
+grant usage on schema public to anon, authenticated;
+grant select on public.courses,public.batches,public.lessons,public.settings to anon;
+grant select on public.profiles,public.courses,public.batches,public.staff_assignments,public.enrollments,public.batch_members,public.lessons,public.progress,public.live_sessions,public.announcements,public.assignments,public.submissions,public.payments,public.certificate_requests,public.certificates,public.settings,public.audit_log,public.exams,public.exam_questions,public.exam_keys,public.exam_attempts to authenticated;
+grant insert,update,delete on public.courses,public.batches,public.staff_assignments,public.enrollments,public.batch_members,public.lessons,public.progress,public.live_sessions,public.announcements,public.assignments,public.settings,public.exams,public.exam_questions,public.exam_keys to authenticated;
+-- No direct client mutation grants/policies for payments, results, roles or certificates.
+create index batches_course_idx on batches(course_id);
+create index staff_course_idx on staff_assignments(course_id);
+create index enrollment_course_idx on enrollments(course_id);
+create index member_batch_idx on batch_members(batch_id);
+create index lessons_course_order_idx on lessons(course_id,position);
+create index progress_lesson_idx on progress(lesson_id);
+create index live_batch_time_idx on live_sessions(batch_id,starts_at);
+create index announcement_batch_idx on announcements(batch_id);
+create index assignment_batch_idx on assignments(batch_id);
+create index submission_student_idx on submissions(student_id);
+create index submission_reviewer_idx on submissions(reviewed_by);
+create index payment_batch_idx on payments(batch_id);
+create index payment_student_idx on payments(student_id);
+create index payment_reviewer_idx on payments(reviewed_by);
+create index request_author_idx on certificate_requests(requested_by);
+create index certificate_student_idx on certificates(student_id);
+create index certificate_request_idx on certificates(request_id);
+create index certificate_issuer_idx on certificates(issued_by);
+create index exam_batch_idx on exams(batch_id);
+create index question_exam_idx on exam_questions(exam_id);
+create index attempt_exam_idx on exam_attempts(exam_id);
+create index attempt_student_idx on exam_attempts(student_id);
+create index audit_time_idx on audit_log(created_at desc);

@@ -50,11 +50,21 @@ export async function upload(
   return path;
 }
 export async function openFile(path: string) {
-  const { data, error } = await database()
-    .storage.from("lms-private")
-    .createSignedUrl(path, 60);
-  if (error) throw error;
-  window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  // Open during the user's click to avoid popup blocking after the network request.
+  const preview = window.open("about:blank", "_blank");
+  if (!preview)
+    throw new Error("Please allow a new tab to view this private file.");
+  preview.opener = null;
+  try {
+    const { data, error } = await database()
+      .storage.from("lms-private")
+      .createSignedUrl(path, 60);
+    if (error) throw error;
+    preview.location.href = data.signedUrl;
+  } catch (error) {
+    preview.close();
+    throw error;
+  }
 }
 export function youtubeId(value: string) {
   if (/^[\w-]{11}$/.test(value)) return value;

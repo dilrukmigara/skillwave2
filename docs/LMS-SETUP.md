@@ -37,7 +37,7 @@ The existing React/Vite website and Vercel deployment are retained. No productio
 - Supply the real course content, fees, bank details, schedules, YouTube IDs, and exam questions. None are fabricated or seeded into production.
 - Review the privacy/learning-terms copy, refunds/cancellations, retention practices, and public testimonials/statistics against actual academy operations.
 - Set the final `VITE_SITE_URL`; update sitemap/robots origins if the canonical domain changes. Vercel previews should remain excluded from indexing. Verify production URLs in Google Search Console and submit the sitemap.
-- Browser-only title updates are provided; full static course-page prerendering and structured course/video data remain future SEO improvements. No search ranking or speed score is claimed.
+- The home, course and news pages are prerendered at build time with unique metadata, canonical URLs and an organization schema. The build generates the sitemap and robots file using VITE_SITE_URL. Dynamic portal/library content still requires JavaScript. No search ranking or speed score is claimed.
 - Original Google Forms use opaque `no-cors` responses. Delivery cannot be proven by the browser; validate actual reception or replace that integration before claiming confirmed submission.
 
 ## Existing repository hygiene
