@@ -37,7 +37,7 @@ export function Navbar() {
     { label: "Home", id: "hero" },
     { label: "About", id: "about" },
     { label: "Courses", id: "levels" },
-    { label: "Why Us", id: "why-choose" },
+    { label: "Free Learning", path: "/free-learning" },
     { label: "News", path: "/news" },
     { label: "Contact", id: "contact" },
   ];
@@ -45,8 +45,13 @@ export function Navbar() {
   const isDark = resolvedTheme === "dark";
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white/80 dark:bg-[#050f1a]/80 backdrop-blur-lg shadow-lg" : "bg-transparent"
-      }`}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/80 dark:bg-[#050f1a]/80 backdrop-blur-lg shadow-lg"
+          : "bg-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link to="/" className="flex items-center gap-3">
@@ -56,7 +61,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-5">
             {navItems.map((item) =>
               item.path ? (
                 <Link
@@ -74,7 +79,7 @@ export function Navbar() {
                 >
                   {item.label}
                 </button>
-              )
+              ),
             )}
             {mounted && (
               <button
@@ -85,9 +90,14 @@ export function Navbar() {
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
-            <Button onClick={() => scrollToSection("contact")}
-              className="bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white">
-              Join Now
+            <Button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/login");
+              }}
+              className="bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white"
+            >
+              Student Login
             </Button>
           </div>
 
@@ -101,7 +111,12 @@ export function Navbar() {
                 {isDark ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             )}
-            <button className="text-gray-700 dark:text-gray-200 cursor-pointer" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <button
+              aria-label="Toggle navigation menu"
+              aria-expanded={isMobileMenuOpen}
+              className="text-gray-700 dark:text-gray-200 cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -129,11 +144,16 @@ export function Navbar() {
                 >
                   {item.label}
                 </button>
-              )
+              ),
             )}
-            <Button onClick={() => scrollToSection("contact")}
-              className="w-full bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white">
-              Join Now
+            <Button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate("/login");
+              }}
+              className="w-full bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white"
+            >
+              Student Login
             </Button>
           </div>
         </div>
@@ -141,4 +161,3 @@ export function Navbar() {
     </nav>
   );
 }
-
