@@ -2,7 +2,7 @@
 
 ## Project and environment
 
-Use a dedicated SkillWave Supabase project. No hosted project was chosen or modified during implementation.
+The selected SkillWave project is `gaggvrnqfjyjguqkqlky`. On 2026-10-13 both migrations were applied successfully in one transaction through the supplied direct Postgres connection after confirming that its public schema was empty. This direct application does not create Supabase CLI migration-history entries: reconcile migration history before any future CLI push; do not reapply these two migrations. Local `.env.local` points to this project, but API keys and the initial Superadmin are still pending. The database password is not saved in the repository.
 
 1. Apply both SQL files in `supabase/migrations/` in timestamp order to the chosen project with your normal reviewed migration workflow.
 2. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key). Also set `SUPABASE_SECRET_KEY` server-side for staff creation; never prefix this secret with `NEXT_PUBLIC_` or commit it.
@@ -74,4 +74,4 @@ Use Node.js 22+ (24 recommended).
 
 PGlite tests verify SQL/RLS behavior, not hosted GoTrue email delivery, real Supabase cookie refresh, SMTP, or deployed configuration. Complete a real signup → confirmation → sign-in → enrollment request → approval → lecturer roster flow, password recovery and logout test against the chosen project before production launch. Full class rosters/catalogs are currently intended for a small academy; add pagination before growing beyond the Supabase API row limit.
 
-Run `node --test tests/staff.test.mjs tests/signup.test.mjs tests/access.test.mjs` for provisioning, signup and database isolation checks. Hosted project creation and account login remain pending until the project connection is configured.
+Run `node --test tests/staff.test.mjs tests/signup.test.mjs tests/access.test.mjs` for provisioning, signup and database isolation checks. The database schema is applied. Auth login and staff provisioning remain pending until the project API keys are configured.
