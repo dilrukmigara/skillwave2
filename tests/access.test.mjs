@@ -14,7 +14,7 @@ const [course, draft, batch, otherBatch, closedBatch, hiddenBatch] = [
 test("LMS database permissions enforce the role and enrollment boundaries", async (t) => {
   const db = new PGlite();
   try {
-    await db.exec(`create role anon; create role authenticated; create schema auth;
+    await db.exec(`create role anon; create role authenticated; create role service_role bypassrls; create schema auth;
       create table auth.users(id uuid primary key);
       create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
       create function auth.jwt() returns jsonb language sql stable as $$ select coalesce(nullif(current_setting('request.jwt.claims',true),''),'{}')::jsonb $$;
@@ -28,6 +28,7 @@ test("LMS database permissions enforce the role and enrollment boundaries", asyn
         "utf8",
       ),
     );
+    await db.exec(await readFile(new URL("../supabase/migrations/20261013045238_staff_account_provisioning.sql", import.meta.url), "utf8"));
     for (const user of [
       owner,
       lecturer,
@@ -310,6 +311,33 @@ test("LMS database permissions enforce the role and enrollment boundaries", asyn
         );
       },
     );
+    await t.test("staff directory is private and provisioning is service-only and atomic", async () => {
+      await db.exec("reset role");
+      const staff = id(90);
+      await db.query("insert into auth.users values ($1)", [staff]);
+      for (const identity of [student, lecturer, owner]) {
+        await as(identity);
+        await assert.rejects(db.query("select public.provision_staff($1,$2,$3,$4,$5)", [staff,"staff@example.test","Staff Name","lecturer",owner]), /permission denied/);
+        await assert.rejects(db.query("insert into public.staff_accounts(user_id,email) values ($1,$2)", [identity,"fake@example.test"]), /permission denied/);
+      }
+      await db.exec("reset role; set role service_role");
+      await assert.rejects(db.query("select public.provision_staff($1,$2,$3,$4,$5)", [staff,"staff@example.test","Staff Name","lecturer",student]), /Superadmin access required/);
+      await assert.rejects(db.query("select public.provision_staff($1,$2,$3,$4,$5)", [staff,"staff@example.test","Staff Name","superadmin",null]), /Initial owner already configured/);
+      await db.query("select public.provision_staff($1,$2,$3,$4,$5)", [staff,"staff@example.test","Staff Name","lecturer",owner]);
+      await as(student);
+      assert.equal((await db.query("select * from public.staff_accounts")).rows.length, 0);
+      await as(staff);
+      assert.equal((await db.query("select email from public.staff_accounts")).rows[0].email, "staff@example.test");
+      await as(owner);
+      assert.equal((await db.query("select * from public.staff_accounts")).rows.length, 1);
+      await db.exec("reset role; set role service_role");
+      const duplicate = id(91);
+      await db.exec("reset role");
+      await db.query("insert into auth.users values ($1)", [duplicate]);
+      await db.exec("set role service_role");
+      await assert.rejects(db.query("select public.provision_staff($1,$2,$3,$4,$5)", [duplicate,"staff@example.test","Duplicate","lecturer",owner]), /duplicate key/);
+      assert.equal((await db.query("select * from public.profiles where id=$1", [duplicate])).rows.length, 0);
+    });
     await t.test(
       "all tables have RLS and no privileged functions are publicly exposed",
       async () => {
@@ -317,7 +345,7 @@ test("LMS database permissions enforce the role and enrollment boundaries", asyn
         const tables = await db.query(
           "select relname,relrowsecurity from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='public' and c.relkind='r'",
         );
-        assert.equal(tables.rows.length, 5);
+        assert.equal(tables.rows.length, 6);
         assert.ok(tables.rows.every((t) => t.relrowsecurity));
         assert.equal(
           (

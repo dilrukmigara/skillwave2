@@ -4,10 +4,10 @@
 
 Use a dedicated SkillWave Supabase project. No hosted project was chosen or modified during implementation.
 
-1. Apply `supabase/migrations/20261012155939_lms_identity_and_enrollment.sql` to the chosen project with your normal reviewed migration workflow.
-2. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key, never a service or secret key).
+1. Apply both SQL files in `supabase/migrations/` in timestamp order to the chosen project with your normal reviewed migration workflow.
+2. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable key). Also set `SUPABASE_SECRET_KEY` server-side for staff creation; never prefix this secret with `NEXT_PUBLIC_` or commit it.
 3. Set `AUTH_SITE_URL` to the exact app origin. For local testing use `http://127.0.0.1:3000`; production must use its HTTPS origin. This is intentionally separate from the SEO canonical URL.
-4. In Supabase Authentication, enable email/password login and **Confirm email**. Keep secure password-change settings enabled and configure password requirements (minimum 12 characters) and suitable Auth rate limits.
+4. In Supabase Authentication, enable email/password login and **Confirm email**. Keep secure password-change settings enabled and configure password requirements (minimum 10 characters; student signup enforces 12) and suitable Auth rate limits.
 5. Set the Supabase Site URL and redirect allowlist to the actual local/preview/production callback URLs, including `/auth/callback` and `/auth/callback?next=/reset-password`. Avoid broad wildcard production redirects.
 6. Configure your own SMTP service for real users. Supabase's default mail service is limited and may restrict recipient addresses; actual confirmation/recovery delivery needs to be tested with the selected project.
 7. Run the Supabase security/performance advisors on the selected project after applying the migration.
@@ -36,26 +36,16 @@ Use templates and Site URL for the appropriate environment; do not point develop
 
 ## First superadmin
 
-There is no public superadmin signup or browser-side promotion. The owner must register, verify their email and sign in once as a student (this creates their profile). After confirming the exact account, an owner with database access can grant the initial superadmin role:
+There is no public superadmin signup. With the migrations and `.env.local` configured, run `node --env-file=.env.local scripts/bootstrap-superadmin.mjs` using Node 24 and supply a JSON object containing `email` and `password` via stdin. Do not put passwords in source control or command-line arguments. This owner-only script checks that no superadmin already exists, creates an auto-confirmed Auth account, atomically provisions profile/role/staff records, then enables login. It does not send an email. The requested owner address is `superadmin@skillwave.lk`; the requested password has not been saved in this repository. No hosted owner has been created until this script succeeds against the selected project.
 
-```sql
--- Replace the example address with the confirmed owner's exact verified email.
-insert into public.user_roles (user_id, role)
-select p.id, 'superadmin'
-from public.profiles p
-join auth.users u on u.id = p.id
-where lower(u.email) = lower('CONFIRMED_OWNER_EMAIL_HERE')
-  and u.email_confirmed_at is not null
-on conflict (user_id) do update set role = excluded.role
-returning user_id, role;
-```
+The owner signs in at `/superadmin/login`. The **Create lecturer account** form takes a name, email and password; it only creates lecturers, never another superadmin. Staff passwords must be 10–128 characters. Existing emails are not silently overwritten; use the existing-account appointment UI instead. Staff email addresses live in `staff_accounts`, role authority lives in `user_roles`, and passwords remain exclusively in Supabase Auth. Revoking a role retains the directory entry as a provisioning record but removes lecturer permissions.
 
-Verify that exactly the intended account was affected. The owner can then sign in at `/superadmin/login`.
+New identities remain banned while provisioning. The profile, role and directory inserts run in one database transaction. A failed transaction deletes only the newly created Auth identity; if cleanup/activation fails, an explicit error directs the owner to inspect the disabled account. Never blindly retry against an existing email.
 
 ## Working flow
 
 - Students enter their email at `/register`, verify the emailed code, set their name/password, and sign in at `/login`.
-- A future lecturer also registers, confirms and signs in once. The superadmin selects this registered account under **Lecturer access** and appoints it. There is no invitation email or automatic staff-account creation in this version.
+- Superadmins create lecturer accounts directly with email/password. Staff need no email verification or student signup; students continue to verify email OTPs. Existing student accounts may also be appointed.
 - Lecturers use `/admin/login`; superadmins use `/superadmin/login`.
 - The superadmin creates/publishes a course, creates a batch and assigns an appointed lecturer.
 - A student requests enrollment from the available batch catalog. The request is always `pending`.
@@ -67,7 +57,7 @@ The catalog only contains public course/batch metadata. It must never hold prote
 
 ## Security boundaries
 
-All five public tables have RLS plus explicit minimal grants. Roles are read from the database, never editable user metadata. Staff writes, course/batch management and enrollment decisions are restricted to superadmins. Students cannot approve themselves, submit a request on another student's behalf, alter identity/role fields, or read other students' records. Lecturers cannot appoint staff or approve enrollments. App-level role checks are repeated inside every server action; database policies also apply to direct Data API requests. No service key is required by the app.
+All six public tables have RLS plus explicit minimal grants. Roles are read from the database, never editable user metadata. Staff writes, course/batch management and enrollment decisions are restricted to superadmins. Students cannot approve themselves, submit a request on another student's behalf, alter identity/role fields, or read other students' records. Lecturers cannot appoint staff or approve enrollments. App-level role checks are repeated inside every server action; database policies also apply to direct Data API requests. A server-only secret key is required only for staff provisioning. Every staff-creation action verifies the current Superadmin role before using that key, and the provisioning transaction checks the creator role again.
 
 `private.current_role()` is a narrowly scoped definer function that reads only `auth.uid()`; it has a fixed search path, is outside exposed schemas, and is executable only by authenticated users. Do not expose the `private` schema in the Data API.
 
@@ -83,3 +73,5 @@ Use Node.js 22+ (24 recommended).
 - `npm run test:auth-http` against a production server **without Supabase environment variables** checks the fail-closed setup state and private-route redirects.
 
 PGlite tests verify SQL/RLS behavior, not hosted GoTrue email delivery, real Supabase cookie refresh, SMTP, or deployed configuration. Complete a real signup → confirmation → sign-in → enrollment request → approval → lecturer roster flow, password recovery and logout test against the chosen project before production launch. Full class rosters/catalogs are currently intended for a small academy; add pagination before growing beyond the Supabase API row limit.
+
+Run `node --test tests/staff.test.mjs tests/signup.test.mjs tests/access.test.mjs` for provisioning, signup and database isolation checks. Hosted project creation and account login remain pending until the project connection is configured.

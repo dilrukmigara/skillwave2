@@ -1,7 +1,9 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
-import { validId } from "@/lib/roles";
+import { createAdminClient, staffCreationEnabled } from "@/lib/supabase/admin";
+import { provisionLecturer } from "@/lib/provision-staff";
+import { emailValue, validId } from "@/lib/roles";
 import type { FormState } from "@/app/auth/actions";
 const text = (form: FormData, key: string) =>
   String(form.get(key) ?? "").trim();
@@ -181,4 +183,20 @@ export async function decideEnrollment(
   if (error) return failed();
   refresh();
   return { success: "Enrollment updated." };
+}
+
+export async function createLecturerAccount(_: FormState, form: FormData): Promise<FormState> {
+  const { user } = await requireUser("superadmin");
+  if (!staffCreationEnabled()) return { error: "Staff account creation is not configured yet." };
+  const email = emailValue(form.get("email"));
+  const name = text(form, "full_name");
+  const password = String(form.get("password") || "");
+  if (!email || name.length < 2 || name.length > 100)
+    return { error: "Enter a valid email and a name between 2 and 100 characters." };
+  if (password.length < 10 || password.length > 128)
+    return { error: "Use a password between 10 and 128 characters." };
+  if (password !== form.get("confirm_password")) return { error: "Passwords do not match." };
+  const result = await provisionLecturer(createAdminClient(), { email, password, name, creator: user.id });
+  refresh();
+  return result;
 }

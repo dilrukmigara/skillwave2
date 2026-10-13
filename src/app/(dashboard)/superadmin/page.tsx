@@ -1,3 +1,4 @@
+import { staffCreationEnabled } from "@/lib/supabase/admin";
 import { requireUser } from "@/lib/auth";
 import {
   Workspace,
@@ -9,6 +10,7 @@ import {
 import { ActionForm } from "@/components/lms/ActionForm";
 import {
   appointLecturer,
+  createLecturerAccount,
   revokeLecturer,
   createCourse,
   setCoursePublished,
@@ -303,10 +305,18 @@ export default async function Page() {
           </div>
         )}
       </Panel>
+      <Panel title="Create lecturer account">
+        <p className="mb-5 text-sm text-slate-500">Create an account and give the lecturer their login details privately. No signup or email verification is needed.</p>
+        {staffCreationEnabled() ? <ActionForm action={createLecturerAccount} label="Create lecturer account">
+          <label className="block text-sm font-medium">Full name<input name="full_name" required minLength={2} maxLength={100} autoComplete="off" className={fieldClass} /></label>
+          <label className="block text-sm font-medium">Lecturer email<input name="email" type="email" required maxLength={254} autoComplete="off" className={fieldClass} /></label>
+          <label className="block text-sm font-medium">Password<input name="password" type="password" required minLength={10} maxLength={128} autoComplete="new-password" className={fieldClass} /><span className="mt-2 block text-xs text-slate-500">At least 10 characters.</span></label>
+          <label className="block text-sm font-medium">Confirm password<input name="confirm_password" type="password" required minLength={10} maxLength={128} autoComplete="new-password" className={fieldClass} /></label>
+        </ActionForm> : <Empty>Staff account creation will be available after setup is complete.</Empty>}
+      </Panel>
       <Panel title="Lecturer access">
         <p className="mb-5 text-sm leading-relaxed text-slate-500">
-          Ask a lecturer to register, verify their email and sign in once as a
-          student. Then grant their lecturer access here.
+          Create a lecturer account above, or grant lecturer access to an existing student account below.
         </p>
         {!!candidates.length ? (
           <ActionForm
