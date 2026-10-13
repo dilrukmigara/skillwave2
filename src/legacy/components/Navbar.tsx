@@ -31,6 +31,7 @@ export function Navbar() {
     { label: "Why Us", path: "/#why-choose" },
     { label: "News", path: "/news" },
     { label: "Contact", path: "/#contact" },
+    { label: "Student login", path: "/login" },
   ];
 
   useEffect(() => { setIsMobileMenuOpen(false); }, [pathname]);
@@ -49,7 +50,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-5">
             {navItems.map((item) => (
               <Link key={item.label} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="block py-2 text-gray-700 dark:text-gray-200 hover:text-emerald-600 font-medium">{item.label}</Link>
             ))}
@@ -66,7 +67,7 @@ export function Navbar() {
               className="bg-gradient-to-r from-[#305a49] to-[#183d64] hover:opacity-90 cursor-pointer text-white"><Link href="/#contact" onClick={() => setIsMobileMenuOpen(false)}>Join Now</Link></Button>
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
             {mounted && (
               <button
                 onClick={() => setTheme(isDark ? "light" : "dark")}
@@ -84,7 +85,7 @@ export function Navbar() {
       </div>
 
       {isMobileMenuOpen && (
-        <div id="mobile-navigation" className="md:hidden bg-white/95 dark:bg-[#050f1a]/95 backdrop-blur-lg shadow-lg">
+        <div id="mobile-navigation" className="lg:hidden bg-white/95 dark:bg-[#050f1a]/95 backdrop-blur-lg shadow-lg">
           <div className="px-4 py-6 space-y-4">
             {navItems.map((item) => (
               <Link key={item.label} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className="block py-2 text-gray-700 dark:text-gray-200 hover:text-emerald-600 font-medium">{item.label}</Link>

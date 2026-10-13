@@ -4,7 +4,7 @@ Next.js App Router + TypeScript + Tailwind CSS. The existing public site has bee
 
 ## Local development
 
-Use Node.js 20.9+ (Node 24 recommended).
+Use Node.js 22+ (Node 24 recommended).
 
 ```sh
 npm ci
@@ -37,10 +37,14 @@ The SEO smoke suite checks HTTP statuses, rendered content without JavaScript, u
 
 Configure Vercel's framework preset as **Next.js**, build command `npm run build`, and remove any Vite `dist` output override. Use the framework's default output settings. Configure `NEXT_PUBLIC_SITE_URL` for the production domain. This branch is intended for preview/review before replacing the existing live deployment.
 
-## Next milestone: Supabase LMS
+## Supabase login and enrollment
 
-Email/password authentication with verification and password recovery; student, lecturer and superadmin roles; course/batch assignments and enrollment approvals; then lessons, private PDFs, assignments and exams. SMS OTP is deliberately deferred. Public free sessions and editable community links will be added as part of the LMS release.
+Student registration, email verification, password recovery, separate student/lecturer/superadmin portals, course/batch creation, lecturer appointments and enrollment approvals are implemented. Database permissions are enforced with RLS and current server-side role checks. SMS OTP remains deferred.
 
-No Supabase project or authentication is connected in this migration. The existing Google Forms inquiries are preserved, including their opaque `no-cors` response limitation; they are not LMS enrollments. Social-link placeholders and existing editorial content still need the academy's real links/content review. News currently retains the original search/modal experience; individual article URLs are a follow-up SEO improvement.
+Follow [the setup guide](docs/SUPABASE_SETUP.md) to select a dedicated project, apply the migration, configure email delivery and bootstrap the first superadmin. With no Supabase configuration the public website works and authentication fails closed with a clear unavailable state. No production database is connected yet.
+
+Run `npm run test:access` for real SQL/RLS isolation tests and `npm run test:auth-http` against an unconfigured running preview. Real hosted signup/email/reset/refresh and the complete enrollment flow require the chosen Supabase project before launch. Lessons/PDFs, assessments, free sessions and editable community links are the next milestones.
+
+The original Google Forms inquiries are preserved, including their opaque `no-cors` response limitation; they are not LMS enrollments. Social placeholders and editorial content still need review. News retains its original modal experience; individual article URLs are a follow-up SEO improvement.
 
 `node_modules` and generated `dist` assets were previously committed; they are now ignored and reproducible from the lockfile. Unused template UI components/dependencies were removed to keep the React upgrade focused on the components in use.
