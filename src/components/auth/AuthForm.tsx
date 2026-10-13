@@ -3,15 +3,13 @@ import { useActionState } from "react";
 import Link from "next/link";
 import {
   signIn,
-  signUp,
   forgotPassword,
   resetPassword,
 } from "@/app/auth/actions";
 import type { Role } from "@/lib/roles";
-type Mode = "login" | "register" | "forgot" | "reset";
+type Mode = "login" | "forgot" | "reset";
 const actions = {
   login: signIn,
-  register: signUp,
   forgot: forgotPassword,
   reset: resetPassword,
 };
@@ -30,19 +28,6 @@ export function AuthForm({
   return (
     <form action={action} className="space-y-5">
       <input type="hidden" name="portal" value={role} />
-      {mode === "register" && (
-        <label className="block text-sm font-medium">
-          Full name
-          <input
-            required
-            name="full_name"
-            autoComplete="name"
-            minLength={2}
-            maxLength={100}
-            className={input}
-          />
-        </label>
-      )}
       {mode !== "reset" && (
         <label className="block text-sm font-medium">
           Email address
@@ -78,7 +63,7 @@ export function AuthForm({
           )}
         </label>
       )}
-      {(mode === "register" || mode === "reset") && (
+      {(mode === "reset") && (
         <label className="block text-sm font-medium">
           Confirm password
           <input
@@ -134,7 +119,6 @@ export function AuthForm({
           ? "Please wait…"
           : {
               login: "Sign in",
-              register: "Create student account",
               forgot: "Send reset link",
               reset: "Save new password",
             }[mode]}

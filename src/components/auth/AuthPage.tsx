@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookOpen, ShieldCheck, ArrowLeft } from "lucide-react";
+import { SignupForm } from "./SignupForm";
 import { AuthForm } from "./AuthForm";
 import { hasSupabase } from "@/lib/supabase/config";
 import type { Role } from "@/lib/roles";
@@ -72,7 +73,7 @@ export function AuthPage({
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
           <p className="mb-8 mt-3 text-slate-500">
             {mode === "register"
-              ? "Create an account, then request access to your batch."
+              ? "Verify your email with a code, then choose your password."
               : mode === "forgot"
                 ? "We’ll email you a link to reset your password."
                 : role === "student"
@@ -87,7 +88,7 @@ export function AuthPage({
               {notices[notice]}
             </p>
           )}
-          <AuthForm mode={mode} role={role} enabled={hasSupabase()} />
+          {mode === "register" ? <SignupForm enabled={hasSupabase()} /> : <AuthForm mode={mode} role={role} enabled={hasSupabase()} />}
           <div className="mt-7 text-center text-sm">
             {mode === "login" && role === "student" ? (
               <>

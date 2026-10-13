@@ -12,6 +12,21 @@ Use a dedicated SkillWave Supabase project. No hosted project was chosen or modi
 6. Configure your own SMTP service for real users. Supabase's default mail service is limited and may restrict recipient addresses; actual confirmation/recovery delivery needs to be tested with the selected project.
 7. Run the Supabase security/performance advisors on the selected project after applying the migration.
 
+## Email OTP signup
+
+Signup now follows email → six-digit OTP → full name and password → email/password login. Phone OTP remains deferred. `signInWithOtp` creates an account when needed, and `verifyOtp` verifies ownership before `updateUser` sets the password. Existing email owners may use the same flow to choose a new password; no roles are changed. Verification creates a Supabase session, so email ownership is itself an authentication factor even before the password step. Reloading signup can be recovered by requesting a fresh code.
+
+In Authentication → Email Templates, set **Magic Link** and **Confirm signup** to include the code, not just a link:
+
+```html
+<h2>Verify your SkillWave email</h2>
+<p>Enter this verification code on SkillWave:</p>
+<p><strong>{{ .Token }}</strong></p>
+<p>If you did not request this code, you can ignore this email.</p>
+```
+
+Configure six-digit email OTPs and an appropriate expiry (for example 10 minutes). Supabase enforces send/verification rate limits; the UI asks users to wait at least 60 seconds before resending. Test invalid, expired and reused codes, resends, existing accounts and expired sessions. Password setup checks the authenticated, confirmed email on the server; a submitted step or email cannot bypass verification. Never log OTPs or passwords.
+
 The PKCE callback (`/auth/callback`) works with the default Supabase email links in the same browser. The optional `/auth/confirm` handler supports token-hash links in custom email templates for confirmations and recovery across browsers:
 
 - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`
@@ -39,7 +54,7 @@ Verify that exactly the intended account was affected. The owner can then sign i
 
 ## Working flow
 
-- Students register at `/register`, confirm their email, and sign in at `/login`.
+- Students enter their email at `/register`, verify the emailed code, set their name/password, and sign in at `/login`.
 - A future lecturer also registers, confirms and signs in once. The superadmin selects this registered account under **Lecturer access** and appoints it. There is no invitation email or automatic staff-account creation in this version.
 - Lecturers use `/admin/login`; superadmins use `/superadmin/login`.
 - The superadmin creates/publishes a course, creates a batch and assigns an appointed lecturer.
