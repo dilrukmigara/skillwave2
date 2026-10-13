@@ -48,3 +48,7 @@ Run `npm run test:access` for real SQL/RLS isolation tests and `npm run test:aut
 The original Google Forms inquiries are preserved, including their opaque `no-cors` response limitation; they are not LMS enrollments. Social placeholders and editorial content still need review. News retains its original modal experience; individual article URLs are a follow-up SEO improvement.
 
 `node_modules` and generated `dist` assets were previously committed; they are now ignored and reproducible from the lockfile. Unused template UI components/dependencies were removed to keep the React upgrade focused on the components in use.
+
+## Vercel build configuration
+
+`vercel.json` selects the Next.js preset, `npm run build`, and `.next` output. These override the old Vite project settings that expected `dist`. Deploy the latest `main` commit rather than redeploying an older commit.
