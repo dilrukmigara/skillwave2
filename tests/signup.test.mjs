@@ -3,50 +3,35 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import ts from 'typescript';
 import vm from 'node:vm';
-function fixture(overrides = {}) {
+function fixture(fail = false, configured = true) {
   const calls = [];
-  const auth = Object.fromEntries(['signInWithOtp','verifyOtp','getUser','updateUser','signOut'].map(name => [name, async args => { calls.push([name,args]); return overrides[name] || { data: {}, error: null }; }]));
-  const roles = {};
   const run = (path, require) => { const exports = {}; vm.runInNewContext(ts.transpileModule(fs.readFileSync(path,'utf8'), {compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require,process,URL}); return exports; };
-  Object.assign(roles,run('src/lib/roles.ts',()=>{}));
+  const roles = run('src/lib/roles.ts',()=>{});
   const actions = run('src/app/auth/actions.ts', name => ({
     'next/navigation': { redirect: path => { throw new Error('redirect:'+path); } },
     'next/cache': { revalidatePath: () => {} },
-    '@/lib/supabase/server': { createClient: async () => ({auth}) },
+    '@/lib/supabase/server': { createClient: async () => {throw new Error('No OTP/session calls expected');} },
+    '@/lib/supabase/admin': {staffCreationEnabled:()=>configured,createAdminClient:()=>({auth:{admin:{createUser:async args=>{calls.push(args);return {error:fail ? {message:'duplicate'} : null};}}}})},
     '@/lib/supabase/config': { hasSupabase: () => true },
     '@/lib/roles': roles,
   })[name]);
-  return {calls, submit: (values, state = {}) => { const form = new FormData(); for (const [k,v] of Object.entries(values)) form.set(k,v); return actions.signUp(state,form); }};
+  return {calls, submit: values => { const form = new FormData(); for (const [k,v] of Object.entries(values)) form.set(k,v); return actions.signUp({},form); }};
 }
-const email = 'learner@example.com';
-test('signup sends email OTP without a password',async()=>{
- const f=fixture(); const result=await f.submit({email,intent:'send'});
- assert.equal(result.step,'verify'); assert.equal(f.calls[0][0],'signInWithOtp'); assert.equal(f.calls[0][1].email,email); assert.equal(f.calls[0][1].password,undefined);
+const valid={email:'learner@example.com',full_name:'New Learner',password:'long-password123',confirm_password:'long-password123'};
+test('registration creates a student without sending email or accepting a privileged role',async()=>{
+ const f=fixture();await assert.rejects(f.submit({...valid,role:'superadmin',user_id:'owner',intent:'complete'}),/redirect:\/login\?notice=registered/);
+ assert.equal(f.calls.length,1);assert.equal(f.calls[0].email_confirm,true);
+ assert.deepEqual(Object.keys(f.calls[0]).sort(),['email','email_confirm','password','user_metadata']);
+ assert.deepEqual(Object.keys(f.calls[0].user_metadata),['full_name']);
 });
-test('invalid and rejected OTP cannot advance to password',async()=>{
- const f=fixture({verifyOtp:{error:{message:'expired'},data:{}}});
- assert.equal((await f.submit({email,intent:'verify',token:'abc'})).step,'verify'); assert.equal(f.calls.length,0);
- assert.equal((await f.submit({email,intent:'verify',token:'123456'})).step,'verify');
+test('existing email is not overwritten or signed in',async()=>{
+ const f=fixture(true); assert.ok((await f.submit(valid)).error);assert.equal(f.calls.length,1);
 });
-test('only confirmed OTP session advances',async()=>{
- const f=fixture({verifyOtp:{error:null,data:{session:{},user:{email_confirmed_at:'today'}}}});
- assert.equal((await f.submit({email,intent:'verify',token:'123456'})).step,'password');
-});
-test('forged client password step and mismatched email cannot save password',async()=>{
- for(const user of [null,{email:'other@example.com',email_confirmed_at:'today'},{email}]) {
- const f=fixture({getUser:{data:{user},error:null}});
- const r=await f.submit({email,intent:'complete',password:'long-password123',confirm_password:'long-password123',full_name:'Learner'},{step:'password',email});
- assert.equal(r.step,'email'); assert.equal(f.calls.some(([n])=>n==='updateUser'),false);
+test('invalid inputs never reach the privileged API',async()=>{
+ for (const fields of [{email:'invalid'},{full_name:'x'},{password:'short'},{confirm_password:'different'}]) {
+  const f=fixture();assert.ok((await f.submit({...valid,...fields})).error);assert.equal(f.calls.length,0);
  }
 });
-test('verified email can save password, revoke sessions and return to login',async()=>{
- const f=fixture({getUser:{data:{user:{email,email_confirmed_at:'today'}},error:null}});
- await assert.rejects(f.submit({email,intent:'complete',password:'long-password123',confirm_password:'long-password123',full_name:'Learner'}),/redirect:\/login/);
- assert.deepEqual(f.calls.map(([n])=>n),['getUser','updateUser','signOut']); assert.equal(f.calls[2][1].scope,'global');
-});
-test('resend rate errors preserve code entry; password validation prevents writes',async()=>{
- const f=fixture({signInWithOtp:{error:{message:'rate limit'}},getUser:{data:{user:{email,email_confirmed_at:'today'}}}});
- assert.equal((await f.submit({email,intent:'resend'})).step,'verify');
- assert.ok((await f.submit({email,intent:'complete',full_name:'Learner',password:'short'})).error);
- assert.equal(f.calls.some(([n])=>n==='updateUser'),false);
+test('registration is unavailable without the server credential',async()=>{
+ const f=fixture(false,false);assert.ok((await f.submit(valid)).error);assert.equal(f.calls.length,0);
 });

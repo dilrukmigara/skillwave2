@@ -12,27 +12,13 @@ The selected SkillWave project is `gaggvrnqfjyjguqkqlky`. On 2026-10-13 both mig
 6. Configure your own SMTP service for real users. Supabase's default mail service is limited and may restrict recipient addresses; actual confirmation/recovery delivery needs to be tested with the selected project.
 7. Run the Supabase security/performance advisors on the selected project after applying the migration.
 
-## Email OTP signup
+## Student registration (temporary, without verification)
 
-Signup now follows email → six-digit OTP → full name and password → email/password login. Phone OTP remains deferred. `signInWithOtp` creates an account when needed, and `verifyOtp` verifies ownership before `updateUser` sets the password. Existing email owners may use the same flow to choose a new password; no roles are changed. Verification creates a Supabase session, so email ownership is itself an authentication factor even before the password step. Reloading signup can be recovered by requesting a fresh code.
+Students enter name, email, password and confirmation at `/register`, then sign in with email/password. The server uses Auth Admin `createUser` with `email_confirm: true`, without sending email. This requires `SUPABASE_SECRET_KEY` in the deployment environment. The form never accepts roles or updates existing users; an existing email returns an error rather than resetting its password. No email ownership verification occurs, even though Supabase marks the account confirmed to permit password login. Do not treat this confirmation flag as proof of email ownership.
 
-In Authentication → Email Templates, set **Magic Link** and **Confirm signup** to include the code, not just a link:
+No Supabase dashboard toggle or SMTP setup is required for this temporary signup flow. Student password minimum remains 12 characters. Staff provisioning is unchanged. Phone OTP will be a separate future implementation.
 
-```html
-<h2>Verify your SkillWave email</h2>
-<p>Enter this verification code on SkillWave:</p>
-<p><strong>{{ .Token }}</strong></p>
-<p>If you did not request this code, you can ignore this email.</p>
-```
-
-Configure six-digit email OTPs and an appropriate expiry (for example 10 minutes). Supabase enforces send/verification rate limits; the UI asks users to wait at least 60 seconds before resending. Test invalid, expired and reused codes, resends, existing accounts and expired sessions. Password setup checks the authenticated, confirmed email on the server; a submitted step or email cannot bypass verification. Never log OTPs or passwords.
-
-The PKCE callback (`/auth/callback`) works with the default Supabase email links in the same browser. The optional `/auth/confirm` handler supports token-hash links in custom email templates for confirmations and recovery across browsers:
-
-- Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup`
-- Recover password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery`
-
-Use templates and Site URL for the appropriate environment; do not point development emails at production. Callback destinations are fixed allowlisted paths, not arbitrary user input.
+Password recovery still uses email and needs working email delivery for arbitrary users. Existing accounts from the previous OTP flow are not overwritten or bulk-confirmed by this change; passwordless or unconfirmed legacy users need owner-assisted recovery.
 
 ## First superadmin
 
@@ -44,8 +30,8 @@ New identities remain banned while provisioning. The profile, role and directory
 
 ## Working flow
 
-- Students enter their email at `/register`, verify the emailed code, set their name/password, and sign in at `/login`.
-- Superadmins create lecturer accounts directly with email/password. Staff need no email verification or student signup; students continue to verify email OTPs. Existing student accounts may also be appointed.
+- Students register at `/register` with name/email/password, then sign in at `/login` without an email code.
+- Superadmins create lecturer accounts directly with email/password. Staff need no email verification or student signup; students use the temporary no-verification signup flow. Existing student accounts may also be appointed.
 - Lecturers use `/admin/login`; superadmins use `/superadmin/login`.
 - The superadmin creates/publishes a course, creates a batch and assigns an appointed lecturer.
 - A student requests enrollment from the available batch catalog. The request is always `pending`.

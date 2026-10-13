@@ -2,9 +2,11 @@ import Link from "next/link";
 import { BookOpen, ShieldCheck, ArrowLeft } from "lucide-react";
 import { SignupForm } from "./SignupForm";
 import { AuthForm } from "./AuthForm";
+import { staffCreationEnabled } from "@/lib/supabase/admin";
 import { hasSupabase } from "@/lib/supabase/config";
 import type { Role } from "@/lib/roles";
 const notices: Record<string, string> = {
+  registered: "Account created. Sign in with your email and password.",
   verify: "Confirm your email before signing in.",
   "password-updated":
     "Your password has been updated. Sign in with your new password.",
@@ -73,7 +75,7 @@ export function AuthPage({
           <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
           <p className="mb-8 mt-3 text-slate-500">
             {mode === "register"
-              ? "Verify your email with a code, then choose your password."
+              ? "Create your student account with your name, email and password."
               : mode === "forgot"
                 ? "We’ll email you a link to reset your password."
                 : role === "student"
@@ -88,7 +90,7 @@ export function AuthPage({
               {notices[notice]}
             </p>
           )}
-          {mode === "register" ? <SignupForm enabled={hasSupabase()} /> : <AuthForm mode={mode} role={role} enabled={hasSupabase()} />}
+          {mode === "register" ? <SignupForm enabled={hasSupabase() && staffCreationEnabled()} /> : <AuthForm mode={mode} role={role} enabled={hasSupabase()} />}
           <div className="mt-7 text-center text-sm">
             {mode === "login" && role === "student" ? (
               <>
