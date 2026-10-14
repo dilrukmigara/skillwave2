@@ -1,8 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
 import Link from "next/link";
-import { Bot, Server, Globe, Clock, ArrowRight, CheckCircle, ChevronDown } from "lucide-react";
+import { Bot, Server, Globe, Clock, ArrowUpRight, Laptop, Layers } from "lucide-react";
 
 export const PROGRAMS = [
   {
@@ -103,177 +102,81 @@ export const PROGRAMS = [
   },
 ];
 
-function ProgramCard({ prog, index }: { prog: typeof PROGRAMS[0]; index: number }) {
-  const Icon = prog.icon;
+type CourseSummary = Pick<typeof PROGRAMS[number],
+  "id" | "route" | "category" | "difficulty" | "title" | "description" | "icon" | "tags"
+> & { detail: string; cover: string; label: string };
 
+const COURSES: CourseSummary[] = [
+  {
+    id: "fit", route: "/fit", category: "IT Foundations", difficulty: "All levels",
+    title: "Foundations of Information Technology",
+    description: "Build your IT foundation through three structured levels, from the essentials to practical technical skills.",
+    icon: Laptop, tags: ["IT Essentials", "Practical Skills", "Projects"],
+    detail: "3 learning levels", cover: "from-emerald-950 to-teal-700", label: "Start with the foundations",
+  },
+  ...PROGRAMS.map((prog, index) => ({
+    ...prog,
+    detail: prog.duration,
+    cover: ["from-slate-900 to-emerald-800", "from-slate-900 to-blue-800", "from-violet-950 to-purple-700"][index],
+    label: ["Connect the physical world", "Build. Deploy. Scale.", "Bring your ideas to the web"][index],
+    description: [
+      "Build smart devices with microcontrollers, sensors and automation. Turn your ideas into working IoT projects.",
+      "Explore cloud infrastructure, containers and CI/CD. Learn to build and manage modern delivery pipelines.",
+      "Go from responsive interfaces to back-end APIs. Build and deploy your own full-stack web applications.",
+    ][index],
+  })),
+];
+
+function ProgramCard({ course }: { course: CourseSummary }) {
+  const Icon = course.icon;
   return (
-    <motion.div
-      initial={false}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="flex flex-col bg-white dark:bg-[#07121f]/50 border border-gray-100 dark:border-white/10 rounded-3xl overflow-hidden hover:shadow-2xl dark:hover:shadow-emerald-500/5 transition-all duration-500 group h-full"
-    >
-      {/* ── Header ── */}
-      <div className={`relative bg-gradient-to-br ${prog.bgGradient} p-7 pb-6 overflow-hidden`}>
-        {/* Radial shine / decorative grid */}
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: "linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)", backgroundSize: "20px 20px" }} />
-
-        <div className="relative z-10">
-          {/* Category + Difficulty */}
-          <div className="flex items-center gap-2 mb-4 flex-wrap">
-            <span className="text-xs font-semibold bg-white/80 dark:bg-black/60 text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full shadow-sm">
-              {prog.category}
-            </span>
-            <span className={`text-xs font-semibold px-3 py-1 rounded-full border ${prog.difficultyColor}`}>
-              {prog.difficulty}
-            </span>
-          </div>
-
-          {/* Icon + Title */}
-          <div className="flex items-start gap-4">
-            <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${prog.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300 shadow-md`}>
-              <Icon className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <p className="text-gray-500 text-xs font-bold tracking-widest uppercase mb-0.5">{prog.short}</p>
-              <h3 className="text-gray-900 dark:text-white font-extrabold text-[22px] leading-tight">{prog.title}</h3>
-            </div>
-          </div>
-
-          {/* Duration */}
-          <div className="flex items-center gap-1.5 mt-4 text-gray-600 dark:text-gray-400 text-sm">
-            <Clock className="w-4 h-4 text-gray-400" />
-            <span>{prog.duration}</span>
-          </div>
+    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-xl dark:border-white/10 dark:bg-[#0b1928]">
+      <div className={`relative flex h-48 flex-col justify-between overflow-hidden bg-gradient-to-br ${course.cover} p-6 text-white`}>
+        <div aria-hidden="true" className="absolute -right-10 -top-10 h-48 w-48 rounded-full border-[28px] border-white/5" />
+        <div aria-hidden="true" className="absolute -bottom-16 right-8 h-40 w-40 rounded-full border border-white/15" />
+        <div className="relative flex items-center justify-between gap-3">
+          <span className="text-xs font-semibold tracking-wide">{course.category}</span>
+          <Icon aria-hidden="true" className="h-6 w-6 text-white/80" />
+        </div>
+        <div className="relative">
+          <Icon aria-hidden="true" className="mb-3 h-10 w-10" strokeWidth={1.4} />
+          <p className="text-sm font-medium text-white/90">{course.label}</p>
         </div>
       </div>
-
-      {/* ── Body ── */}
-      <div className="flex flex-col flex-1 p-7 space-y-6 bg-white dark:bg-[#050f1a] transition-colors duration-300">
-        {/* Description */}
-        <p className="text-gray-600 dark:text-gray-400 text-[15px] leading-relaxed">{prog.description}</p>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Students", value: prog.stats.students },
-            { label: "Rating", value: prog.stats.rating + " ⭐" },
-            { label: "Completion", value: prog.stats.completion },
-          ].map((s) => (
-            <div key={s.label} className="bg-gray-50 dark:bg-[#183d64]/10 rounded-xl p-3 text-center border border-gray-100/50 dark:border-white/5">
-              <p className="text-gray-900 dark:text-white font-bold text-sm">{s.value}</p>
-              <p className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">{s.label}</p>
-            </div>
-          ))}
+      <div className="flex flex-1 flex-col p-6">
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-600 dark:text-slate-300">
+          <span className="rounded-md bg-slate-100 px-2 py-1 dark:bg-white/10">{course.difficulty}</span>
+          <span className="inline-flex items-center gap-1.5">
+            {course.id === "fit" ? <Layers aria-hidden="true" className="h-3.5 w-3.5" /> : <Clock aria-hidden="true" className="h-3.5 w-3.5" />}
+            {course.detail}
+          </span>
         </div>
-
-        {/* Learning Outcomes */}
-        <div>
-          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-3">What You'll Achieve</p>
-          <div className="space-y-2">
-            {prog.outcomes.map((o) => (
-              <div key={o} className="flex items-center gap-2">
-                <CheckCircle className={`w-4 h-4 flex-shrink-0 ${prog.accentText}`} />
-                <p className="text-gray-600 dark:text-gray-300 text-sm">{o}</p>
-              </div>
-            ))}
-          </div>
+        <h3 className="mb-3 text-xl font-bold leading-snug text-slate-900 dark:text-white">{course.title}</h3>
+        <p className="mb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{course.description}</p>
+        <div className="mb-6 mt-auto flex flex-wrap gap-2">
+          {course.tags.slice(0, 3).map(tag => <span key={tag} className="rounded-full border border-slate-200 px-2.5 py-1 text-xs text-slate-600 dark:border-white/10 dark:text-slate-300">{tag}</span>)}
         </div>
-
-        {/* Roadmap */}
-        <div>
-          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-3">Programme Roadmap</p>
-          <div className="space-y-1">
-            {prog.modules.map((m, i) => (
-              <div key={i}>
-                <div className="flex items-start gap-3">
-                  <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${prog.color} flex items-center justify-center flex-shrink-0 text-white text-xs font-extrabold`}>
-                    {m.step}
-                  </div>
-                  <div>
-                    <p className="text-gray-900 dark:text-white text-sm font-semibold">{m.title}</p>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs">{m.sub}</p>
-                  </div>
-                </div>
-                {i < prog.modules.length - 1 && (
-                  <div className="ml-3.5 mt-0.5 mb-0.5">
-                    <ChevronDown className="w-3 h-3 text-gray-400 dark:text-gray-600" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Skill Tags */}
-        <div className="flex flex-wrap gap-2">
-          {prog.tags.map((t) => (
-            <span key={t}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium ${prog.accentBg} ${prog.accentText} border ${prog.accentBorder}`}>
-              {t}
-            </span>
-          ))}
-        </div>
-
-        {/* Career Paths */}
-        <div>
-          <p className="text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest mb-2">Career Paths</p>
-          <div className="flex flex-wrap gap-2">
-            {prog.careers.map((c) => (
-              <span key={c} className="text-xs text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-3 py-1 rounded-full">
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-auto pt-2">
-          <Link href={prog.route}>
-            <motion.div
-              whileHover={{ x: 4 }}
-              className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r ${prog.color} text-white font-semibold py-3.5 px-6 rounded-xl hover:opacity-90 transition-opacity text-sm cursor-pointer`}
-            >
-              Explore Programme
-              <ArrowRight className="w-4 h-4" />
-            </motion.div>
-          </Link>
-        </div>
+        <Link href={course.route} aria-label={`View course: ${course.title}`} className="flex items-center justify-between gap-2 rounded-xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-emerald-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-500 dark:bg-white/5 dark:text-white dark:hover:bg-emerald-900/60">
+          View course <ArrowUpRight aria-hidden="true" className="h-5 w-5" />
+        </Link>
       </div>
-    </motion.div>
+    </article>
   );
 }
 
 export function OurPrograms() {
   return (
-    <section id="levels" className="relative py-24 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-[#050f1a] dark:to-[#07121f] transition-colors duration-300">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-green-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute inset-0 opacity-[0.015]"
-          style={{ backgroundImage: "linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px)", backgroundSize: "40px 40px" }} />
-      </div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={false} whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm tracking-widest uppercase mb-6 shadow-sm">
-            <Server className="w-4 h-4 text-gray-500" /> Our Programs
-          </span>
-          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
-            More Paths to Greatness
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto transition-colors duration-300">
-            Specialist programmes in Robotics & IoT, DevOps, and Full-Stack Web. Click any card to explore the full programme.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-          {PROGRAMS.map((prog, i) => (
-            <ProgramCard key={prog.id} prog={prog} index={i} />
-          ))}
+    <section id="levels" aria-labelledby="courses-heading" className="scroll-mt-24 bg-slate-50 py-16 sm:py-24 dark:bg-[#07121f]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Find your next step</p>
+            <h2 id="courses-heading" className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl dark:text-white">A course for your next chapter.</h2>
+          </div>
+          <p className="max-w-sm text-sm leading-relaxed text-slate-600 dark:text-slate-300">Start with the fundamentals or explore a specialist path. Find the skills you want to build.</p>
+        </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {COURSES.map(course => <ProgramCard key={course.id} course={course} />)}
         </div>
       </div>
     </section>

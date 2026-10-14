@@ -15,7 +15,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-green-50 dark:from-[#050f1a] dark:via-[#07121f] dark:to-[#050f1a] transition-colors duration-300"
+      className="relative min-h-[75vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50 to-green-50 dark:from-[#050f1a] dark:via-[#07121f] dark:to-[#050f1a] transition-colors duration-300"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-[#305a49]/10 rounded-full blur-3xl animate-pulse"></div>
@@ -39,13 +39,13 @@ export function Hero() {
         </svg>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16 text-center">
         <motion.div
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight mb-6 bg-gradient-to-r from-[#305a49] to-[#183d64] dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
             Empowering the Next Generation
             <br />
             Through Future Ready Skills
@@ -53,7 +53,7 @@ export function Hero() {
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto transition-colors duration-300">
             Learn In-Demand Skills from beginner to advanced levels with SkillWave.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
             <Button
               size="lg"
               onClick={() => scrollToSection("levels")}
@@ -76,7 +76,7 @@ export function Hero() {
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto"
         >
           {[
             { icon: Code, label: "Coding" },
@@ -86,9 +86,9 @@ export function Hero() {
           ].map((item, index) => (
             <div
               key={index}
-              className="bg-white/60 dark:bg-white/5 backdrop-blur-lg rounded-2xl p-6 shadow-lg dark:shadow-emerald-950/20 hover:shadow-xl transition-all duration-300 border border-transparent dark:border-white/5"
+              className="bg-white/60 dark:bg-white/5 backdrop-blur-lg rounded-2xl p-4 shadow-sm dark:shadow-emerald-950/20 hover:shadow-xl transition-all duration-300 border border-transparent dark:border-white/5"
             >
-              <item.icon className="w-12 h-12 mx-auto mb-3 text-[#183d64] dark:text-cyan-400" />
+              <item.icon className="w-6 h-6 mx-auto mb-2 text-[#183d64] dark:text-cyan-400" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{item.label}</p>
             </div>
           ))}
